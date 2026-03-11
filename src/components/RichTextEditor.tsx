@@ -1,0 +1,145 @@
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Link from "@tiptap/extension-link";
+import Placeholder from "@tiptap/extension-placeholder";
+import { Bold, Italic, List, ListOrdered, Link as LinkIcon, Undo, Redo } from "lucide-react";
+import { useEffect } from "react";
+
+interface RichTextEditorProps {
+  value: string;
+  onChange: (html: string) => void;
+  placeholder?: string;
+}
+
+const ToolbarButton = ({
+  active,
+  onClick,
+  children,
+  title,
+}: {
+  active?: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+  title: string;
+}) => (
+  <button
+    type="button"
+    onClick={onClick}
+    title={title}
+    className={`rounded p-1.5 transition-colors ${
+      active
+        ? "bg-primary/15 text-primary"
+        : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+    }`}
+  >
+    {children}
+  </button>
+);
+
+const RichTextEditor = ({ value, onChange, placeholder }: RichTextEditorProps) => {
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        heading: { levels: [2, 3] },
+      }),
+      Link.configure({
+        openOnClick: false,
+        HTMLAttributes: { class: "text-primary underline" },
+      }),
+      Placeholder.configure({
+        placeholder: placeholder || "Write something...",
+      }),
+    ],
+    content: value,
+    onUpdate: ({ editor }) => {
+      onChange(editor.getHTML());
+    },
+    editorProps: {
+      attributes: {
+        class:
+          "prose prose-sm max-w-none min-h-[120px] px-3 py-2.5 text-sm text-foreground focus:outline-none [&_p]:my-1 [&_ul]:my-1 [&_ol]:my-1 [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:mt-3 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mt-2",
+      },
+    },
+  });
+
+  // Sync external value changes (e.g. when loading existing data)
+  useEffect(() => {
+    if (editor && value !== editor.getHTML() && value !== undefined) {
+      editor.commands.setContent(value, { emitUpdate: false });
+    }
+  }, [value]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!editor) return null;
+
+  const setLink = () => {
+    const url = window.prompt("Enter URL:");
+    if (url) {
+      editor.chain().focus().setLink({ href: url }).run();
+    } else {
+      editor.chain().focus().unsetLink().run();
+    }
+  };
+
+  return (
+    <div className="rounded-md border border-border bg-background overflow-hidden focus-within:ring-2 focus-within:ring-primary/30">
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center gap-0.5 border-b border-border bg-muted/30 px-2 py-1">
+        <ToolbarButton
+          active={editor.isActive("bold")}
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          title="Bold"
+        >
+          <Bold className="h-4 w-4" />
+        </ToolbarButton>
+        <ToolbarButton
+          active={editor.isActive("italic")}
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+          title="Italic"
+        >
+          <Italic className="h-4 w-4" />
+        </ToolbarButton>
+        <div className="mx-1 h-5 w-px bg-border" />
+        <ToolbarButton
+          active={editor.isActive("bulletList")}
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          title="Bullet list"
+        >
+          <List className="h-4 w-4" />
+        </ToolbarButton>
+        <ToolbarButton
+          active={editor.isActive("orderedList")}
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          title="Numbered list"
+        >
+          <ListOrdered className="h-4 w-4" />
+        </ToolbarButton>
+        <div className="mx-1 h-5 w-px bg-border" />
+        <ToolbarButton
+          active={editor.isActive("link")}
+          onClick={setLink}
+          title="Link"
+        >
+          <LinkIcon className="h-4 w-4" />
+        </ToolbarButton>
+        <div className="mx-1 h-5 w-px bg-border" />
+        <ToolbarButton
+          onClick={() => editor.chain().focus().undo().run()}
+          title="Undo"
+        >
+          <Undo className="h-4 w-4" />
+        </ToolbarButton>
+        <ToolbarButton
+          onClick={() => editor.chain().focus().redo().run()}
+          title="Redo"
+        >
+          <Redo className="h-4 w-4" />
+        </ToolbarButton>
+      </div>
+
+      {/* Editor */}
+      <EditorContent editor={editor} />
+    </div>
+  );
+};
+
+export default RichTextEditor;

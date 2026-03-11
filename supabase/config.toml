@@ -1,0 +1,34 @@
+project_id = "mfzufzajsybdgdlhjkie"
+
+[functions.notify-tribute]
+verify_jwt = false
+
+[functions.generate-sitemap]
+verify_jwt = false
+
+[functions.send-receipt]
+verify_jwt = false
+
+[functions.create-checkout]
+verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.og-memorial]
+verify_jwt = false
+
+[functions.create-plan-checkout]
+verify_jwt = false
+
+[functions.check-subscription]
+verify_jwt = false
+
+[functions.customer-portal]
+verify_jwt = false
+
+[functions.check-ban]
+verify_jwt = false
+
+[functions.delete-account]
+verify_jwt = false

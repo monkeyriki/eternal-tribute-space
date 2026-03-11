@@ -1,0 +1,1 @@
+ALTER TABLE public.memorials ADD COLUMN IF NOT EXISTS require_tribute_approval boolean NOT NULL DEFAULT false;

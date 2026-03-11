@@ -1,0 +1,1 @@
+ALTER TABLE public.tributes ADD COLUMN sender_email text DEFAULT NULL;

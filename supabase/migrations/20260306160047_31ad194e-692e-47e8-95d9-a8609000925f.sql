@@ -1,0 +1,1 @@
+ALTER TABLE public.memorials ADD COLUMN video_url TEXT DEFAULT '';

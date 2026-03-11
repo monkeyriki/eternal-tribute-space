@@ -1,0 +1,1 @@
+ALTER TABLE public.memorials DROP CONSTRAINT IF EXISTS memorials_user_id_fkey;
