@@ -41,6 +41,41 @@ export type Database = {
         }
         Relationships: []
       }
+      memorial_images: {
+        Row: {
+          caption: string | null
+          created_at: string
+          id: string
+          memorial_id: string
+          sort_order: number
+          url: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          memorial_id: string
+          sort_order?: number
+          url: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          memorial_id?: string
+          sort_order?: number
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memorial_images_memorial_id_fkey"
+            columns: ["memorial_id"]
+            isOneToOne: false
+            referencedRelation: "memorials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       memorial_reports: {
         Row: {
           created_at: string
@@ -68,6 +103,113 @@ export type Database = {
           reason?: string
           reporter_ip?: string | null
           status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_memorial_reports_memorial"
+            columns: ["memorial_id"]
+            isOneToOne: false
+            referencedRelation: "memorials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      memorials: {
+        Row: {
+          bio: string | null
+          birth_date: string | null
+          created_at: string
+          death_date: string | null
+          first_name: string
+          id: string
+          image_url: string | null
+          is_draft: boolean
+          last_name: string
+          location: string | null
+          password_hash: string | null
+          plan: string
+          require_tribute_approval: boolean
+          tags: string[] | null
+          type: string
+          updated_at: string
+          user_id: string
+          video_url: string | null
+          visibility: string
+        }
+        Insert: {
+          bio?: string | null
+          birth_date?: string | null
+          created_at?: string
+          death_date?: string | null
+          first_name: string
+          id?: string
+          image_url?: string | null
+          is_draft?: boolean
+          last_name?: string
+          location?: string | null
+          password_hash?: string | null
+          plan?: string
+          require_tribute_approval?: boolean
+          tags?: string[] | null
+          type?: string
+          updated_at?: string
+          user_id: string
+          video_url?: string | null
+          visibility?: string
+        }
+        Update: {
+          bio?: string | null
+          birth_date?: string | null
+          created_at?: string
+          death_date?: string | null
+          first_name?: string
+          id?: string
+          image_url?: string | null
+          is_draft?: boolean
+          last_name?: string
+          location?: string | null
+          password_hash?: string | null
+          plan?: string
+          require_tribute_approval?: boolean
+          tags?: string[] | null
+          type?: string
+          updated_at?: string
+          user_id?: string
+          video_url?: string | null
+          visibility?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          plan: string
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          plan?: string
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          plan?: string
+          role?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -114,7 +256,15 @@ export type Database = {
           stripe_session_id?: string | null
           tier?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_tributes_memorial"
+            columns: ["memorial_id"]
+            isOneToOne: false
+            referencedRelation: "memorials"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
