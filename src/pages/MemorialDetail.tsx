@@ -70,7 +70,7 @@ const MemorialDetail = () => {
   // Track page view
   useEffect(() => {
     if (!id) return;
-    supabase.from("memorial_views" as any).insert({ memorial_id: id } as any).then();
+    supabase.from("memorial_views").insert({ memorial_id: id }).then();
   }, [id]);
 
   const { data: tributes = [], refetch: refetchTributes } = useQuery({
