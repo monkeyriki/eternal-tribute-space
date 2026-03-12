@@ -42,9 +42,9 @@ const B2BDashboard = () => {
   const { data: memorials = [], isLoading } = useQuery({
     queryKey: ["b2b-memorials", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("memorials" as any).select("*").eq("user_id", user!.id).order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("memorials").select("*").eq("user_id", user!.id).order("created_at", { ascending: false });
       if (error) throw error;
-      return (data as any[]) || [];
+      return data || [];
     },
     enabled: !!user,
   });
@@ -53,8 +53,8 @@ const B2BDashboard = () => {
   useQuery({
     queryKey: ["b2b-logo", user?.id],
     queryFn: async () => {
-      const { data } = await supabase.from("memorials" as any).select("b2b_logo_url").eq("user_id", user!.id).not("b2b_logo_url", "eq", "").limit(1);
-      if ((data as any[])?.[0]?.b2b_logo_url) setLogoUrl((data as any[])[0].b2b_logo_url);
+      const { data } = await supabase.from("memorials").select("b2b_logo_url").eq("user_id", user!.id).neq("b2b_logo_url", "").limit(1);
+      if (data?.[0]?.b2b_logo_url) setLogoUrl(data[0].b2b_logo_url);
       return data;
     },
     enabled: !!user,
@@ -65,10 +65,10 @@ const B2BDashboard = () => {
     queryFn: async () => {
       const ids = memorials.map((m) => m.id);
       if (ids.length === 0) return {};
-      const { data, error } = await supabase.from("tributes" as any).select("memorial_id").in("memorial_id", ids);
+      const { data, error } = await supabase.from("tributes").select("memorial_id").in("memorial_id", ids);
       if (error) throw error;
       const counts: Record<string, number> = {};
-      (data as any[]).forEach((t: any) => { counts[t.memorial_id] = (counts[t.memorial_id] || 0) + 1; });
+      (data || []).forEach((t) => { counts[t.memorial_id] = (counts[t.memorial_id] || 0) + 1; });
       return counts;
     },
     enabled: memorials.length > 0,
@@ -79,11 +79,10 @@ const B2BDashboard = () => {
     queryFn: async () => {
       const ids = memorials.map((m) => m.id);
       if (ids.length === 0) return {};
+      const { data, error } = await supabase.from("memorial_views").select("memorial_id").in("memorial_id", ids);
+      if (error) throw error;
       const counts: Record<string, number> = {};
-      await Promise.all(ids.map(async (mid: any) => {
-        const { data, error }: any = await (supabase.rpc as any)("get_memorial_view_count", { _memorial_id: mid });
-        if (!error && data != null) counts[mid] = Number(data);
-      }));
+      (data || []).forEach((v) => { counts[v.memorial_id] = (counts[v.memorial_id] || 0) + 1; });
       return counts;
     },
     enabled: memorials.length > 0,
@@ -98,7 +97,7 @@ const B2BDashboard = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("memorials" as any).delete().eq("id", id);
+      const { error } = await supabase.from("memorials").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -122,7 +121,7 @@ const B2BDashboard = () => {
     setLogoUrl(newUrl);
 
     // Update all existing memorials with new logo
-    await supabase.from("memorials" as any).update({ b2b_logo_url: newUrl } as any).eq("user_id", user.id);
+    await supabase.from("memorials").update({ b2b_logo_url: newUrl }).eq("user_id", user.id);
     toast({ title: "Agency logo updated on all memorials" });
     queryClient.invalidateQueries({ queryKey: ["b2b-memorials"] });
   };
@@ -158,7 +157,7 @@ const B2BDashboard = () => {
       const cols = row.split(",").map((c) => c.trim());
       const record: Record<string, string> = {};
       headers.forEach((h, i) => (record[h] = cols[i] || ""));
-      const { error } = await supabase.from("memorials" as any).insert({
+      const { error } = await supabase.from("memorials").insert({
         user_id: user!.id,
         first_name: record["first_name"] || record["nome"] || "",
         last_name: record["last_name"] || record["cognome"] || "",
@@ -169,7 +168,7 @@ const B2BDashboard = () => {
         is_draft: true,
         visibility: "public",
         b2b_logo_url: logoUrl,
-      } as any);
+      });
       if (!error) imported++;
     }
     toast({ title: `${imported} memorials imported as drafts` });

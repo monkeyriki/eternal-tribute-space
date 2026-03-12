@@ -145,6 +145,7 @@ export type Database = {
       }
       memorials: {
         Row: {
+          b2b_logo_url: string | null
           bio: string | null
           birth_date: string | null
           created_at: string
@@ -166,6 +167,7 @@ export type Database = {
           visibility: string
         }
         Insert: {
+          b2b_logo_url?: string | null
           bio?: string | null
           birth_date?: string | null
           created_at?: string
@@ -187,6 +189,7 @@ export type Database = {
           visibility?: string
         }
         Update: {
+          b2b_logo_url?: string | null
           bio?: string | null
           birth_date?: string | null
           created_at?: string
