@@ -1,4 +1,4 @@
-import { Facebook, Mail, MessageCircle } from "lucide-react";
+import { Facebook, Mail, MessageCircle, Twitter } from "lucide-react";
 
 interface ShareButtonsProps {
   url: string;
