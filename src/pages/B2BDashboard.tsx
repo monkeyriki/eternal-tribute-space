@@ -121,7 +121,7 @@ const B2BDashboard = () => {
     setLogoUrl(newUrl);
 
     // Update all existing memorials with new logo
-    await supabase.from("memorials" as any).update({ b2b_logo_url: newUrl } as any).eq("user_id", user.id);
+    await supabase.from("memorials").update({ b2b_logo_url: newUrl }).eq("user_id", user.id);
     toast({ title: "Agency logo updated on all memorials" });
     queryClient.invalidateQueries({ queryKey: ["b2b-memorials"] });
   };
