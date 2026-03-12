@@ -16,6 +16,7 @@ const ShareButtons = ({ url, title, memorialId }: ShareButtonsProps) => {
 
   const links = [
     { label: "Facebook", icon: Facebook, href: `https://www.facebook.com/sharer/sharer.php?u=${encodedOgUrl}`, color: "hover:bg-[#1877F2]/10 hover:text-[#1877F2]" },
+    { label: "X", icon: Twitter, href: `https://x.com/intent/tweet?url=${encodedOgUrl}&text=${encodedTitle}`, color: "hover:bg-foreground/10 hover:text-foreground" },
     { label: "WhatsApp", icon: MessageCircle, href: `https://wa.me/?text=${encodedTitle}%20${encodedOgUrl}`, color: "hover:bg-[#25D366]/10 hover:text-[#25D366]" },
     { label: "Email", icon: Mail, href: `mailto:?subject=${encodedTitle}&body=${encodeURIComponent(url)}`, color: "hover:bg-primary/10 hover:text-primary" },
   ];

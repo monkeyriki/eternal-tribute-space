@@ -240,6 +240,9 @@ const ModerationTab = () => {
                         <Button size="sm" variant="outline" onClick={() => dismissReportMutation.mutate(r.id)}>
                           Dismiss
                         </Button>
+                        <Button size="sm" variant="destructive" onClick={() => deleteMemorialMutation.mutate({ memorialId: r.memorial_id, reportId: r.id })}>
+                          <Trash2 className="mr-1 h-3 w-3" /> Delete Memorial
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))
