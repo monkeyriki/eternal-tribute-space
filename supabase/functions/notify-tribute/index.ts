@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { tribute_id, memorial_id, sender_name, message, tier, is_flagged } =
+    const { tribute_id, memorial_id, sender_name, message, tier, is_flagged, is_pending_approval } =
       await req.json();
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -54,6 +54,8 @@ serve(async (req) => {
     const memorialName = `${memorial.first_name} ${memorial.last_name}`.trim();
     const statusText = is_flagged
       ? "⚠️ Un tributo è stato segnalato e richiede la tua approvazione"
+      : is_pending_approval
+      ? "🔔 Un nuovo tributo è in attesa della tua approvazione"
       : "❤️ Un nuovo tributo è stato pubblicato";
 
     const emailHtml = `
