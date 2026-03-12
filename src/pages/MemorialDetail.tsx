@@ -156,7 +156,7 @@ const MemorialDetail = () => {
     );
   }
 
-  const isPasswordProtected = memorial.visibility === "password" && (memorial as any).has_password;
+  const isPasswordProtected = memorial.visibility === "password" && memorial.has_password;
   if (isPasswordProtected && !passwordUnlocked) {
     const name = memorial.last_name
       ? `${memorial.first_name} ${memorial.last_name}`
