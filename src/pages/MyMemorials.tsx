@@ -16,12 +16,12 @@ const MyMemorials = () => {
     queryKey: ["my-memorials", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("memorials" as any)
+        .from("memorials")
         .select("*")
         .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data as any[]) || [];
+      return data || [];
     },
     enabled: !!user,
   });
@@ -29,7 +29,7 @@ const MyMemorials = () => {
   const drafts = memorials.filter((m) => m.is_draft);
   const published = memorials.filter((m) => !m.is_draft);
 
-  const MemorialRow = ({ m }: { m: any }) => {
+  const MemorialRow = ({ m }: { m: typeof memorials[number] }) => {
     const fullName = [m.first_name, m.last_name].filter(Boolean).join(" ");
     return (
       <div className="flex items-center gap-4 rounded-lg border border-border bg-card p-4 transition-colors hover:border-primary/30">

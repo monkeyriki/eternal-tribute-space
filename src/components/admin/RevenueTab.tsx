@@ -16,16 +16,16 @@ const RevenueTab = () => {
   const { data: transactions = [] } = useQuery({
     queryKey: ["admin-transactions"],
     queryFn: async () => {
-      const { data } = await supabase.from("transactions" as any).select("*").order("created_at", { ascending: false });
-      return (data as any[]) || [];
+      const { data } = await supabase.from("transactions").select("*").order("created_at", { ascending: false });
+      return data || [];
     },
   });
 
   const { data: paidTributes = [] } = useQuery({
     queryKey: ["admin-paid-tributes"],
     queryFn: async () => {
-      const { data } = await supabase.from("tributes" as any).select("*").eq("is_paid", true).order("created_at", { ascending: false });
-      return (data as any[]) || [];
+      const { data } = await supabase.from("tributes").select("*").eq("is_paid", true).order("created_at", { ascending: false });
+      return data || [];
     },
   });
 
@@ -37,16 +37,16 @@ const RevenueTab = () => {
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
       months[key] = { tributes: 0, plans: 0 };
     }
-    transactions.forEach((t: any) => {
+    transactions.forEach((t) => {
       const key = t.created_at?.slice(0, 7);
-      if (months[key]) {
+      if (key && months[key]) {
         if (t.type === "tribute") months[key].tributes += Number(t.amount);
         else months[key].plans += Number(t.amount);
       }
     });
-    paidTributes.forEach((t: any) => {
+    paidTributes.forEach((t) => {
       const key = t.created_at?.slice(0, 7);
-      if (months[key]) {
+      if (key && months[key]) {
         const price = t.tier === "premium" ? 5 : t.tier === "standard" ? 2 : 0;
         months[key].tributes += price;
       }

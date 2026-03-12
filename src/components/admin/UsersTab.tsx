@@ -25,15 +25,15 @@ const UsersTab = () => {
     queryFn: async () => {
       const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
       if (error) throw error;
-      return (data as any[]) || [];
+      return data || [];
     },
   });
 
   const { data: bannedUsers = [] } = useQuery({
     queryKey: ["banned_users"],
     queryFn: async () => {
-      const { data } = await supabase.from("banned_users" as any).select("*").order("created_at", { ascending: false });
-      return (data as any[]) || [];
+      const { data } = await supabase.from("banned_users").select("*").order("banned_at", { ascending: false });
+      return data || [];
     },
   });
 
@@ -54,7 +54,7 @@ const UsersTab = () => {
 
   const banMutation = useMutation({
     mutationFn: async ({ email, reason, ip_address }: { email: string; reason: string; ip_address?: string }) => {
-      const { error } = await supabase.from("banned_users" as any).insert({ email, reason, ip_address: ip_address || null } as any);
+      const { error } = await supabase.from("banned_users").insert({ email, reason, ip_address: ip_address || null });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -69,7 +69,7 @@ const UsersTab = () => {
 
   const unbanMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("banned_users" as any).delete().eq("id", id);
+      const { error } = await supabase.from("banned_users").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -150,7 +150,7 @@ const UsersTab = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {bannedUsers.map((b: any) => (
+                  {bannedUsers.map((b) => (
                      <TableRow key={b.id}>
                        <TableCell className="font-medium">{b.email || "—"}</TableCell>
                        <TableCell>{b.ip_address || "—"}</TableCell>

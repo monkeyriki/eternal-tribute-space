@@ -19,16 +19,16 @@ const AdminPanel = () => {
   const { data: profiles = [] } = useQuery({
     queryKey: ["admin-profiles"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("profiles" as any).select("*").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
       if (error) throw error;
-      return (data as any[]) || [];
+      return data || [];
     },
   });
 
   const { data: memorialCount = 0 } = useQuery({
     queryKey: ["admin-memorial-count"],
     queryFn: async () => {
-      const { count, error } = await supabase.from("memorials" as any).select("*", { count: "exact", head: true });
+      const { count, error } = await supabase.from("memorials").select("*", { count: "exact", head: true });
       if (error) throw error;
       return count || 0;
     },
@@ -37,7 +37,7 @@ const AdminPanel = () => {
   const { data: tributeCount = 0 } = useQuery({
     queryKey: ["admin-tribute-count"],
     queryFn: async () => {
-      const { count, error } = await supabase.from("tributes" as any).select("*", { count: "exact", head: true });
+      const { count, error } = await supabase.from("tributes").select("*", { count: "exact", head: true });
       if (error) throw error;
       return count || 0;
     },
@@ -46,7 +46,7 @@ const AdminPanel = () => {
   const { data: flaggedCount = 0 } = useQuery({
     queryKey: ["admin-flagged-count"],
     queryFn: async () => {
-      const { count, error } = await supabase.from("tributes" as any).select("*", { count: "exact", head: true }).eq("status", "flagged" as any);
+      const { count, error } = await supabase.from("tributes").select("*", { count: "exact", head: true }).eq("status", "flagged");
       if (error) throw error;
       return count || 0;
     },

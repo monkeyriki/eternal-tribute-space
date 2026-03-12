@@ -20,26 +20,26 @@ const ModerationTab = () => {
   const { data: flaggedTributes = [] } = useQuery({
     queryKey: ["admin-flagged-tributes"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("tributes" as any).select("*, memorials(first_name, last_name)").eq("status", "flagged" as any).order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("tributes").select("*, memorials(first_name, last_name)").eq("status", "flagged").order("created_at", { ascending: false });
       if (error) throw error;
-      return data;
+      return data || [];
     },
   });
 
   const { data: allTributes = [] } = useQuery({
     queryKey: ["admin-all-tributes"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("tributes" as any).select("*, memorials(first_name, last_name)").order("created_at", { ascending: false }).limit(100);
+      const { data, error } = await supabase.from("tributes").select("*, memorials(first_name, last_name)").order("created_at", { ascending: false }).limit(100);
       if (error) throw error;
-      return data;
+      return data || [];
     },
   });
 
   const { data: profanityWords = [] } = useQuery({
     queryKey: ["profanity_words"],
     queryFn: async () => {
-      const { data } = await supabase.from("profanity_words" as any).select("*");
-      return (data as any[]) || [];
+      const { data } = await supabase.from("profanity_words").select("*");
+      return data || [];
     },
   });
 
@@ -58,7 +58,7 @@ const ModerationTab = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("tributes" as any).delete().eq("id", id);
+      const { error } = await supabase.from("tributes").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -70,7 +70,7 @@ const ModerationTab = () => {
 
   const addWordMutation = useMutation({
     mutationFn: async (word: string) => {
-      const { error } = await supabase.from("profanity_words" as any).insert({ word: word.toLowerCase().trim() } as any);
+      const { error } = await supabase.from("profanity_words").insert({ word: word.toLowerCase().trim() });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -83,7 +83,7 @@ const ModerationTab = () => {
 
   const removeWordMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("profanity_words" as any).delete().eq("id", id);
+      const { error } = await supabase.from("profanity_words").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -97,20 +97,20 @@ const ModerationTab = () => {
     queryKey: ["admin-memorial-reports"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("memorial_reports" as any)
+        .from("memorial_reports")
         .select("*, memorials(first_name, last_name)")
-        .eq("status", "pending" as any)
+        .eq("status", "pending")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data as any[];
+      return data || [];
     },
   });
 
   const dismissReportMutation = useMutation({
     mutationFn: async (reportId: string) => {
       const { error } = await supabase
-        .from("memorial_reports" as any)
-        .update({ status: "resolved" } as any)
+        .from("memorial_reports")
+        .update({ status: "resolved" })
         .eq("id", reportId);
       if (error) throw error;
     },
@@ -249,7 +249,7 @@ const ModerationTab = () => {
             </Button>
           </div>
           <div className="flex flex-wrap gap-2">
-            {profanityWords.map((pw: any) => (
+            {profanityWords.map((pw) => (
               <Badge key={pw.id} variant="secondary" className="gap-1 pr-1">
                 {pw.word}
                 <button onClick={() => removeWordMutation.mutate(pw.id)} className="ml-1 hover:text-destructive">

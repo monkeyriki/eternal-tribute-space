@@ -14,14 +14,14 @@ const RecentMemorials = () => {
     queryKey: ["recent-memorials"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("memorials" as any)
+        .from("memorials")
         .select("id, first_name, last_name, birth_date, death_date, location, image_url, type")
         .eq("visibility", "public")
         .eq("is_draft", false)
         .order("created_at", { ascending: false })
         .limit(4);
       if (error) throw error;
-      return (data as any[]) || [];
+      return data || [];
     },
   });
 

@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,19 +20,19 @@ const MemorialsTab = () => {
     queryKey: ["admin-memorials"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("memorials" as any)
+        .from("memorials")
         .select("id, first_name, last_name, type, plan, visibility, is_draft, created_at, user_id")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data as any[]) || [];
+      return data || [];
     },
   });
 
   const handleDelete = async (id: string) => {
     try {
-      await supabase.from("tributes" as any).delete().eq("memorial_id", id);
-      await supabase.from("memorial_images" as any).delete().eq("memorial_id", id);
-      const { error } = await supabase.from("memorials" as any).delete().eq("id", id);
+      await supabase.from("tributes").delete().eq("memorial_id", id);
+      await supabase.from("memorial_images").delete().eq("memorial_id", id);
+      const { error } = await supabase.from("memorials").delete().eq("id", id);
       if (error) throw error;
       toast.success("Memorial deleted");
       queryClient.invalidateQueries({ queryKey: ["admin-memorials"] });
@@ -44,8 +44,8 @@ const MemorialsTab = () => {
 
   const handleToggleDraft = async (id: string, currentDraft: boolean) => {
     const { error } = await supabase
-      .from("memorials" as any)
-      .update({ is_draft: !currentDraft } as any)
+      .from("memorials")
+      .update({ is_draft: !currentDraft })
       .eq("id", id);
     if (error) {
       toast.error("Failed to update");
