@@ -25,6 +25,8 @@ import { format } from "date-fns";
 import { enUS } from "date-fns/locale";
 
 const B2B_FREE_LIMIT = 5;
+/** Max rows per CSV import to avoid DB/timeout overload. */
+const B2B_IMPORT_MAX_ROWS = 200;
 
 const B2BDashboard = () => {
   const { user } = useAuth();
@@ -132,7 +134,15 @@ const B2BDashboard = () => {
       return;
     }
     const headers = lines[0].split(",").map((h) => h.trim().toLowerCase());
-    const rows = lines.slice(1);
+    const allRows = lines.slice(1);
+    const rows = allRows.slice(0, B2B_IMPORT_MAX_ROWS);
+    if (allRows.length > B2B_IMPORT_MAX_ROWS) {
+      toast({
+        title: "Import capped",
+        description: `Only the first ${B2B_IMPORT_MAX_ROWS} rows are imported per request. Import the rest in another run.`,
+        variant: "default",
+      });
+    }
 
     if (!hasSubscription && totalMemorials + rows.length > B2B_FREE_LIMIT) {
       toast({

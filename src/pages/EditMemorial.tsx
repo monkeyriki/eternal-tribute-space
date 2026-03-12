@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { compressImage } from "@/lib/imageCompression";
 import { checkPhotoLimit } from "@/lib/checkPhotoLimit";
+import { getFriendlyErrorMessage } from "@/lib/utils";
 
 interface GalleryItem {
   file: File;
@@ -99,11 +100,14 @@ const EditMemorial = () => {
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
+    if (!file) return;
+    try {
       toast("Compressing image...");
       const compressed = await compressImage(file);
       setImageFile(compressed);
       setImagePreview(URL.createObjectURL(compressed));
+    } catch {
+      toast.error("We couldn't use that photo. Please try another image or a smaller file.");
     }
   };
 
@@ -201,7 +205,7 @@ const EditMemorial = () => {
       toast.success(isDraft ? "Draft saved" : "Memorial updated");
       navigate(`/memorial/${memorial.id}`);
     } catch (error: any) {
-      toast.error(error.message || "Unable to save changes.");
+      toast.error(getFriendlyErrorMessage(error, "memorial_save"));
     } finally {
       setSubmitting(false);
     }

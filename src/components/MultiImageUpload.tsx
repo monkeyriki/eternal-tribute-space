@@ -43,7 +43,7 @@ const MultiImageUpload = ({ images, onChange, maxImages = 20 }: MultiImageUpload
       onChange([...images, ...compressed]);
       toast.success(`${compressed.length} image(s) added`);
     } catch {
-      toast.error("Error compressing images");
+      toast.error("We couldn't add that image. Please try another photo.");
     } finally {
       setCompressing(false);
     }

@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { compressImage } from "@/lib/imageCompression";
 import { checkPhotoLimit } from "@/lib/checkPhotoLimit";
+import { getFriendlyErrorMessage } from "@/lib/utils";
 
 interface GalleryItem {
   file: File;
@@ -45,7 +46,8 @@ const CreateMemorial = () => {
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
+    if (!file) return;
+    try {
       toast({ title: "Compressing image..." });
       const compressed = await compressImage(file);
       setImageFile(compressed);
@@ -54,6 +56,12 @@ const CreateMemorial = () => {
         const saved = Math.round((1 - compressed.size / file.size) * 100);
         toast({ title: `Image compressed (${saved}% smaller)` });
       }
+    } catch {
+      toast({
+        title: "We couldn't use that photo",
+        description: "Please try another image or a smaller file.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -142,9 +150,11 @@ const CreateMemorial = () => {
       });
       navigate(isDraft ? "/my-memorials" : `/memorial/${memorial.id}`);
     } catch (error: any) {
+      const friendly = getFriendlyErrorMessage(error, "memorial_save");
+      const isUpload = friendly.toLowerCase().includes("photo") || friendly.toLowerCase().includes("upload");
       toast({
-        title: "Error",
-        description: error.message || "Unable to save the memorial.",
+        title: isUpload ? "Photo upload failed" : "We couldn't save the memorial",
+        description: friendly,
         variant: "destructive",
       });
     } finally {

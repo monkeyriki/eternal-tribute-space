@@ -6,6 +6,7 @@ import { loadProfanityWords, checkProfanity } from "@/lib/profanityFilter";
 import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
 import { tributeTiers as fallbackTiers, TributeTier } from "@/data/tributeTiers";
+import { getFriendlyErrorMessage } from "@/lib/utils";
 
 interface TributeSelectorProps {
   memorialId: string;
@@ -158,36 +159,37 @@ const TributeSelector = ({ memorialId, firstName, onTributeAdded, requireApprova
         throw new Error("No checkout URL returned");
       } catch (err: any) {
         console.error("Checkout error:", err);
-        toast.error("Payment failed. Please try again.", {
-          description: err.message,
-        });
+        toast.error(getFriendlyErrorMessage(err, "payment"));
         setSending(false);
         return;
       }
     }
 
     // Free tribute — insert directly
-    const isFlagged = checkProfanity(message, profanityWords);
-    const tributeStatus = isFlagged ? "flagged" : requireApproval ? "pending" : "approved";
+    try {
+      const isFlagged = checkProfanity(message, profanityWords);
+      const tributeStatus = isFlagged ? "flagged" : requireApproval ? "pending" : "approved";
 
-    const { error } = await supabase.from("tributes" as any).insert({
-      memorial_id: memorialId,
-      sender_name: senderName.trim() || "Anonymous",
-      message,
-      item_type: selected.name,
-      tier: selected.tier,
-      is_paid: false,
-      status: tributeStatus,
-      sender_email: senderEmail.trim() || null,
-    } as any);
+      const { error } = await supabase.from("tributes" as any).insert({
+        memorial_id: memorialId,
+        sender_name: senderName.trim() || "Anonymous",
+        message,
+        item_type: selected.name,
+        tier: selected.tier,
+        is_paid: false,
+        status: tributeStatus,
+        sender_email: senderEmail.trim() || null,
+      } as any);
 
-    if (error) {
-      if (error.message?.includes("Rate limit exceeded")) {
-        toast.error("You have reached the limit of 3 free tributes per memorial per day.");
-      } else {
-        toast.error("Error sending tribute");
+      if (error) {
+        if (error.message?.includes("Rate limit exceeded")) {
+          toast.error("You have reached the limit of 3 free tributes per memorial per day.");
+        } else {
+          toast.error(getFriendlyErrorMessage(error, "tribute"));
+        }
+        return;
       }
-    } else {
+
       if (isFlagged) {
         toast.info("Your tribute is pending review by a moderator.");
       } else if (requireApproval) {
@@ -226,8 +228,12 @@ const TributeSelector = ({ memorialId, firstName, onTributeAdded, requireApprova
       setSenderEmail("");
       setSelected(tiers[0]);
       onTributeAdded();
+    } catch (err: any) {
+      console.error("Tribute submit error:", err);
+      toast.error(getFriendlyErrorMessage(err, "tribute"));
+    } finally {
+      setSending(false);
     }
-    setSending(false);
   };
 
   const renderIcon = (tier: TributeTier & { iconUrl?: string; iconType?: string }) => {

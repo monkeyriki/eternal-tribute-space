@@ -33,10 +33,12 @@ const tierOrder = (tier: string): number => {
   return 2;
 };
 
-const getPremiumDaysLeft = (createdAt: string): number => {
-  const created = new Date(createdAt);
-  const expiresAt = new Date(created.getTime() + 30 * 24 * 60 * 60 * 1000);
+/** Use DB expires_at when present, else fallback to created_at + 30 days (backwards compatibility). */
+const getPremiumDaysLeft = (entry: { created_at: string; expires_at: string | null }): number => {
   const now = new Date();
+  const expiresAt = entry.expires_at
+    ? new Date(entry.expires_at)
+    : new Date(new Date(entry.created_at).getTime() + 30 * 24 * 60 * 60 * 1000);
   const diff = expiresAt.getTime() - now.getTime();
   return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
 };
@@ -71,7 +73,7 @@ const GuestbookList = ({ tributes, isOwner = false, onTributeModerated }: Guestb
     const isPending = entry.status === "pending";
 
     const isPremium = entry.tier === "premium" && entry.is_paid;
-    const premiumDaysLeft = isPremium ? getPremiumDaysLeft(entry.created_at) : 0;
+    const premiumDaysLeft = isPremium ? getPremiumDaysLeft(entry) : 0;
     const isPremiumActive = isPremium && premiumDaysLeft > 0;
 
     const isStandard = entry.tier === "standard";
