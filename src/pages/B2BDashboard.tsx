@@ -157,7 +157,7 @@ const B2BDashboard = () => {
       const cols = row.split(",").map((c) => c.trim());
       const record: Record<string, string> = {};
       headers.forEach((h, i) => (record[h] = cols[i] || ""));
-      const { error } = await supabase.from("memorials" as any).insert({
+      const { error } = await supabase.from("memorials").insert({
         user_id: user!.id,
         first_name: record["first_name"] || record["nome"] || "",
         last_name: record["last_name"] || record["cognome"] || "",
@@ -168,7 +168,7 @@ const B2BDashboard = () => {
         is_draft: true,
         visibility: "public",
         b2b_logo_url: logoUrl,
-      } as any);
+      });
       if (!error) imported++;
     }
     toast({ title: `${imported} memorials imported as drafts` });
