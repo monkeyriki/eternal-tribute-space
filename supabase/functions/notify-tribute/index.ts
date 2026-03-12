@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { tribute_id, memorial_id, sender_name, message, tier, is_flagged } =
+    const { tribute_id, memorial_id, sender_name, message, tier, is_flagged, is_pending_approval } =
       await req.json();
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
