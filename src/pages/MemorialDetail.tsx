@@ -117,12 +117,12 @@ const MemorialDetail = () => {
     if (!reportReason || !id) return;
     setReporting(true);
     try {
-      const { error } = await supabase.from("memorial_reports" as any).insert({
+      const { error } = await supabase.from("memorial_reports").insert({
         memorial_id: id,
         reason: reportReason,
         details: reportDetails || null,
         reporter_ip: window.location.hostname,
-      } as any);
+      });
       if (error) throw error;
       toast.success("Thank you, your report has been submitted for review.");
       setShowReport(false);
