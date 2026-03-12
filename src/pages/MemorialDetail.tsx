@@ -53,7 +53,7 @@ const MemorialDetail = () => {
     queryKey: ["memorial", id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("memorials" as any)
+        .from("memorials")
         .select("*")
         .eq("id", id!)
         .maybeSingle();
@@ -62,7 +62,7 @@ const MemorialDetail = () => {
         return null;
       }
       if (!data) return null;
-      return { ...(data as any), has_password: !!(data as any).password_hash };
+      return { ...data, has_password: !!data.password_hash };
     },
     enabled: !!id,
   });
