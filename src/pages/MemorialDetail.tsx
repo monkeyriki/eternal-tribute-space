@@ -250,7 +250,7 @@ memorialName={name}
   const ogDescription = memorial.bio?.slice(0, 155) || `Memorial dedicated to ${fullName}`;
   const embedUrl = getVideoEmbedUrl(memorial.video_url || "");
   const tags = memorial.tags || [];
-  const b2bLogo = (memorial as any).b2b_logo_url;
+  const b2bLogo = (memorial as any)?.b2b_logo_url;
 
   const isPublic = memorial.visibility === "public";
   const shouldNoIndex = !isPublic;
