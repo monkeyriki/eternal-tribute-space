@@ -120,6 +120,20 @@ const ModerationTab = () => {
     },
   });
 
+  const deleteMemorialMutation = useMutation({
+    mutationFn: async ({ memorialId, reportId }: { memorialId: string; reportId: string }) => {
+      // Delete the memorial (cascades to images, tributes, views, reports via FK)
+      const { error } = await supabase.from("memorials").delete().eq("id", memorialId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-memorial-reports"] });
+      qc.invalidateQueries({ queryKey: ["admin-memorials"] });
+      toast({ title: "Memorial deleted" });
+    },
+    onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),
+  });
+
   const renderTributeTable = (tributes: any[], showApprove: boolean) => (
     <div className="overflow-x-auto">
       <Table>
@@ -225,6 +239,9 @@ const ModerationTab = () => {
                       <TableCell className="text-right">
                         <Button size="sm" variant="outline" onClick={() => dismissReportMutation.mutate(r.id)}>
                           Dismiss
+                        </Button>
+                        <Button size="sm" variant="destructive" onClick={() => deleteMemorialMutation.mutate({ memorialId: r.memorial_id, reportId: r.id })}>
+                          <Trash2 className="mr-1 h-3 w-3" /> Delete Memorial
                         </Button>
                       </TableCell>
                     </TableRow>
