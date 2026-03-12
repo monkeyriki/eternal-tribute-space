@@ -114,6 +114,35 @@ export type Database = {
           },
         ]
       }
+      memorial_views: {
+        Row: {
+          created_at: string
+          id: string
+          memorial_id: string
+          viewer_ip: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          memorial_id: string
+          viewer_ip?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          memorial_id?: string
+          viewer_ip?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memorial_views_memorial_id_fkey"
+            columns: ["memorial_id"]
+            isOneToOne: false
+            referencedRelation: "memorials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       memorials: {
         Row: {
           bio: string | null
@@ -180,6 +209,24 @@ export type Database = {
         }
         Relationships: []
       }
+      profanity_words: {
+        Row: {
+          created_at: string
+          id: string
+          word: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          word: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          word?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -212,6 +259,120 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      site_settings: {
+        Row: {
+          id: string
+          key: string
+          updated_at: string
+          value: string | null
+        }
+        Insert: {
+          id?: string
+          key: string
+          updated_at?: string
+          value?: string | null
+        }
+        Update: {
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: string | null
+        }
+        Relationships: []
+      }
+      store_items: {
+        Row: {
+          category: string
+          created_at: string
+          emoji: string | null
+          icon_url: string | null
+          id: string
+          is_active: boolean
+          name: string
+          price: number
+          tier: string
+          type: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          emoji?: string | null
+          icon_url?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          price?: number
+          tier?: string
+          type?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          emoji?: string | null
+          icon_url?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          price?: number
+          tier?: string
+          type?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          memorial_id: string | null
+          metadata: Json | null
+          stripe_session_id: string | null
+          tribute_id: string | null
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          memorial_id?: string | null
+          metadata?: Json | null
+          stripe_session_id?: string | null
+          tribute_id?: string | null
+          type?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          memorial_id?: string | null
+          metadata?: Json | null
+          stripe_session_id?: string | null
+          tribute_id?: string | null
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_memorial_id_fkey"
+            columns: ["memorial_id"]
+            isOneToOne: false
+            referencedRelation: "memorials"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_tribute_id_fkey"
+            columns: ["tribute_id"]
+            isOneToOne: false
+            referencedRelation: "tributes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tributes: {
         Row: {
@@ -265,24 +426,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      user_roles: {
-        Row: {
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Insert: {
-          id?: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Update: {
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
-        }
-        Relationships: []
       }
     }
     Views: {
