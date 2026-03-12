@@ -198,7 +198,7 @@ memorialName={name}
     try {
       // 1. Fetch all gallery images to get storage paths
       const { data: galleryImages } = await supabase
-        .from("memorial_images" as any)
+        .from("memorial_images")
         .select("url")
         .eq("memorial_id", memorial.id);
 
