@@ -432,6 +432,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_approve_tribute: {
+        Args: { tribute_id: string }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -441,6 +445,10 @@ export type Database = {
       }
       is_memorial_owner: {
         Args: { _memorial_id: string; _user_id: string }
+        Returns: boolean
+      }
+      verify_memorial_password: {
+        Args: { _attempt: string; _memorial_id: string }
         Returns: boolean
       }
     }
