@@ -559,7 +559,7 @@ memorialName={name}
           </div>
         </section>
 
-        <AdBanner position="sidebar" memorialPlan={(memorial as any).plan} />
+        <AdBanner position="sidebar" memorialPlan={memorial.plan} />
       </Layout>
     </>
   );
