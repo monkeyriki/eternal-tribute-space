@@ -227,9 +227,9 @@ memorialName={name}
       }
 
       // 3. Delete DB rows
-      await supabase.from("tributes" as any).delete().eq("memorial_id", memorial.id);
-      await supabase.from("memorial_images" as any).delete().eq("memorial_id", memorial.id);
-      const { error } = await supabase.from("memorials" as any).delete().eq("id", memorial.id);
+      await supabase.from("tributes").delete().eq("memorial_id", memorial.id);
+      await supabase.from("memorial_images").delete().eq("memorial_id", memorial.id);
+      const { error } = await supabase.from("memorials").delete().eq("id", memorial.id);
       if (error) throw error;
       toast.success("Memorial deleted");
       navigate(`/directory/${memorial.type}`);
