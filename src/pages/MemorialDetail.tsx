@@ -552,7 +552,7 @@ memorialName={name}
             </div>
 
             <GuestbookList
-              tributes={tributes as any}
+              tributes={tributes}
               isOwner={isOwner}
               onTributeModerated={() => refetchTributes()}
             />
