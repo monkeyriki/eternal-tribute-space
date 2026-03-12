@@ -547,7 +547,7 @@ memorialName={name}
                 memorialId={memorial.id}
                 firstName={memorial.first_name}
                 onTributeAdded={() => refetchTributes()}
-                requireApproval={!!(memorial as any).require_tribute_approval}
+                requireApproval={!!memorial.require_tribute_approval}
               />
             </div>
 
