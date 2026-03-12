@@ -77,11 +77,11 @@ const MemorialDetail = () => {
     queryKey: ["tributes", id],
     queryFn: async () => {
       const { data } = await supabase
-        .from("tributes" as any)
+        .from("tributes")
         .select("*")
         .eq("memorial_id", id!)
         .order("created_at", { ascending: false });
-      return (data as any[]) || [];
+      return data || [];
     },
     enabled: !!id,
   });
