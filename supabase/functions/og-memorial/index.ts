@@ -29,7 +29,7 @@ Deno.serve(async (req) => {
       .from("memorials")
       .select("first_name, last_name, birth_date, death_date, image_url, bio, type")
       .eq("id", memorialId)
-      .eq("visibility", "public")
+      .in("visibility", ["public", "unlisted"])
       .eq("is_draft", false)
       .single();
 
