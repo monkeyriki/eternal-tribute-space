@@ -206,6 +206,7 @@ const TributeSelector = ({ memorialId, firstName, onTributeAdded, requireApprova
           message,
           tier: selected.tier,
           is_flagged: isFlagged,
+          is_pending_approval: !isFlagged && requireApproval,
         },
       }).catch((err) => console.error("notify-tribute error:", err));
 
