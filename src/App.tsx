@@ -21,6 +21,7 @@ import UserSettings from "./pages/UserSettings";
 import PricingPage from "./pages/PricingPage";
 import MyMemorials from "./pages/MyMemorials";
 import ResetPassword from "./pages/ResetPassword";
+import CookieConsentBanner from "./components/CookieConsentBanner";
 
 const queryClient = new QueryClient();
 
