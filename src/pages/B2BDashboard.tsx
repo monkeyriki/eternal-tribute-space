@@ -97,7 +97,7 @@ const B2BDashboard = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("memorials" as any).delete().eq("id", id);
+      const { error } = await supabase.from("memorials").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
