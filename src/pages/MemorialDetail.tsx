@@ -52,18 +52,17 @@ const MemorialDetail = () => {
   const { data: memorial, isLoading } = useQuery({
     queryKey: ["memorial", id],
     queryFn: async () => {
-      // First try direct table access (works for owners & admins via RLS)
       const { data, error } = await supabase
         .from("memorials" as any)
         .select("*")
         .eq("id", id!)
-        .single();
-      if (!error && data) return { ...(data as any), has_password: !!(data as any).password_hash };
-      
-      // Fallback to public RPC (excludes password_hash, works for everyone)
-      const { data: pubData, error: pubError }: any = await (supabase.rpc as any)("get_memorial_public", { _memorial_id: id! });
-      if (pubError || !pubData || pubData.length === 0) return null;
-      return pubData[0];
+        .maybeSingle();
+      if (error) {
+        console.error("Memorial fetch error:", error);
+        return null;
+      }
+      if (!data) return null;
+      return { ...(data as any), has_password: !!(data as any).password_hash };
     },
     enabled: !!id,
   });
