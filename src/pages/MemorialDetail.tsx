@@ -90,11 +90,11 @@ const MemorialDetail = () => {
     queryKey: ["memorial_images", id],
     queryFn: async () => {
       const { data } = await supabase
-        .from("memorial_images" as any)
+        .from("memorial_images")
         .select("*")
         .eq("memorial_id", id!)
         .order("sort_order", { ascending: true });
-      return (data || []).map((img: any) => ({
+      return (data || []).map((img) => ({
         id: img.id,
         url: img.url,
         caption: img.caption || "",
