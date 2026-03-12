@@ -60,10 +60,10 @@ const Directory = () => {
     queryKey: ["directory", memorialType],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("memorials" as any).select("*")
+        .from("memorials").select("*")
         .eq("type", memorialType).eq("visibility", "public").eq("is_draft", false);
       if (error) throw error;
-      return (data || []).map((m: any): Memorial => ({
+      return (data || []).map((m): Memorial => ({
         id: m.id, type: m.type as "human" | "pet",
         firstName: m.first_name, lastName: m.last_name || "",
         birthDate: m.birth_date || "", deathDate: m.death_date || "",
@@ -348,9 +348,22 @@ const Directory = () => {
                   <Pagination>
                     <PaginationContent>
                       {page > 1 && (<PaginationItem><PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); setPage(page - 1); }} /></PaginationItem>)}
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                        <PaginationItem key={p}><PaginationLink href="#" isActive={p === page} onClick={(e) => { e.preventDefault(); setPage(p); }}>{p}</PaginationLink></PaginationItem>
-                      ))}
+                      {Array.from({ length: totalPages }, (_, i) => i + 1)
+                        .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+                        .map((p, idx, arr) => {
+                          const items = [];
+                          if (idx > 0 && arr[idx - 1] !== p - 1) {
+                            items.push(<PaginationItem key={`ellipsis-${p}`}><span className="px-2 text-muted-foreground">…</span></PaginationItem>);
+                          }
+                          items.push(
+                            <PaginationItem key={p}>
+                              <PaginationLink href="#" isActive={p === page} onClick={(e) => { e.preventDefault(); setPage(p); }}>
+                                {p}
+                              </PaginationLink>
+                            </PaginationItem>
+                          );
+                          return items;
+                        })}
                       {page < totalPages && (<PaginationItem><PaginationNext href="#" onClick={(e) => { e.preventDefault(); setPage(page + 1); }} /></PaginationItem>)}
                     </PaginationContent>
                   </Pagination>
@@ -360,9 +373,11 @@ const Directory = () => {
           ) : (
             <div className="py-20 text-center">
               <p className="text-lg text-muted-foreground">No memorials found</p>
-              <p className="mt-1 text-sm text-muted-foreground">Try adjusting your search filters</p>
+              <p className="mt-1 text-sm text-muted-foreground">Try adjusting your search or filters</p>
             </div>
           )}
+
+          <AdBanner position="sidebar" />
         </div>
       </Layout>
     </>
