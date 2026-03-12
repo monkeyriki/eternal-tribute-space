@@ -327,7 +327,7 @@ memorialName={name}
           </div>
         )}
 
-        <AdBanner position="top" memorialPlan={(memorial as any).plan} />
+        <AdBanner position="top" memorialPlan={memorial.plan} />
 
         <section className="container mx-auto px-4 py-8 md:py-12">
           <div className="mx-auto max-w-3xl">
