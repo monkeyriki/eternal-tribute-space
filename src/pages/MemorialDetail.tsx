@@ -206,7 +206,7 @@ memorialName={name}
 
       // Collect gallery image paths
       if (galleryImages) {
-        for (const img of (galleryImages as any[])) {
+        for (const img of galleryImages) {
           const path = extractStoragePath(img.url);
           if (path) storagePaths.push(path);
         }
