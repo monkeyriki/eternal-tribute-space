@@ -46,8 +46,9 @@ Deno.serve(async (req) => {
     const description = memorial.bio
       ? memorial.bio.substring(0, 160)
       : `Remembering ${fullName}. Visit their memorial on Eternal Memory.`;
-    const imageUrl = memorial.image_url || "https://forever-flame-tributes.lovable.app/placeholder.svg";
-    const pageUrl = `https://forever-flame-tributes.lovable.app/memorial/${memorialId}`;
+    const siteUrl = Deno.env.get("SITE_URL") || "https://eternal-tribute-space.lovable.app";
+    const imageUrl = memorial.image_url || `${siteUrl}/placeholder.svg`;
+    const pageUrl = `${siteUrl}/memorial/${memorialId}`;
     const siteName = "Eternal Memory";
 
     const html = `<!DOCTYPE html>
