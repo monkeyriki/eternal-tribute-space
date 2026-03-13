@@ -44,6 +44,16 @@ const EditMemorial = () => {
     enabled: !!id,
   });
 
+  const { data: isAdminUser } = useQuery({
+    queryKey: ["is-admin-edit", user?.id],
+    queryFn: async () => {
+      if (!user) return false;
+      const { data } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" as any });
+      return !!data;
+    },
+    enabled: !!user,
+  });
+
   const { data: existingGallery = [] } = useQuery({
     queryKey: ["memorial_images_edit", id],
     queryFn: async () => {
