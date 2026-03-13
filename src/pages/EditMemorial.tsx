@@ -89,7 +89,8 @@ const EditMemorial = () => {
 
   const handleSubmit = async (isDraft: boolean) => {
     if (!user || !memorial) return;
-    if (memorial.user_id !== user.id) { toast.error("You don't have permission to edit this memorial"); return; }
+    const isAdminForSubmit = !!isAdminUser;
+    if (memorial.user_id !== user.id && !isAdminForSubmit) { toast.error("You don't have permission to edit this memorial"); return; }
     setSubmitting(true);
     try {
       let image_url = existingImageUrl;
