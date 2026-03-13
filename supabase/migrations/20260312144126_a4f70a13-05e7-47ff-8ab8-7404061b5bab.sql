@@ -1,0 +1,1 @@
+ALTER TABLE public.memorials ADD COLUMN IF NOT EXISTS b2b_logo_url text DEFAULT '' NULL;

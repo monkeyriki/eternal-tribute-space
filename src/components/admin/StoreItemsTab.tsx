@@ -12,13 +12,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2, Package } from "lucide-react";
+import type { Tables } from "@/integrations/supabase/types";
 
-interface StoreItem {
-  id: string; name: string; price: number; category: string;
-  icon_url: string; emoji: string; type: string; tier: string; is_active: boolean;
-}
+type StoreItem = Tables<"store_items">;
 
-const emptyItem: Omit<StoreItem, "id"> = {
+const emptyItem: Omit<StoreItem, "id" | "created_at"> = {
   name: "", price: 0, category: "tribute", icon_url: "", emoji: "🕯️",
   type: "emoji", tier: "standard", is_active: true,
 };
@@ -34,19 +32,19 @@ const StoreItemsTab = () => {
   const { data: items = [], isLoading } = useQuery({
     queryKey: ["store_items"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("store_items" as any).select("*").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("store_items").select("*").order("created_at", { ascending: false });
       if (error) throw error;
-      return (data as any[]) as StoreItem[];
+      return data || [];
     },
   });
 
   const saveMutation = useMutation({
-    mutationFn: async (item: Omit<StoreItem, "id"> & { id?: string }) => {
+    mutationFn: async (item: typeof form & { id?: string }) => {
       if (item.id) {
-        const { error } = await supabase.from("store_items" as any).update(item as any).eq("id", item.id);
+        const { error } = await supabase.from("store_items").update(item).eq("id", item.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("store_items" as any).insert(item as any);
+        const { error } = await supabase.from("store_items").insert(item);
         if (error) throw error;
       }
     },
@@ -60,7 +58,7 @@ const StoreItemsTab = () => {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("store_items" as any).delete().eq("id", id);
+      const { error } = await supabase.from("store_items").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -71,7 +69,7 @@ const StoreItemsTab = () => {
 
   const toggleMutation = useMutation({
     mutationFn: async ({ id, is_active }: { id: string; is_active: boolean }) => {
-      const { error } = await supabase.from("store_items" as any).update({ is_active } as any).eq("id", id);
+      const { error } = await supabase.from("store_items").update({ is_active }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["store_items"] }),
@@ -88,7 +86,6 @@ const StoreItemsTab = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    const ext = file.name.split(".").pop();
     const path = `icons/${Date.now()}-${file.name}`;
     const { error } = await supabase.storage.from("store-items").upload(path, file);
     if (error) {
@@ -186,7 +183,7 @@ const StoreItemsTab = () => {
               </Select>
             </div>
             {form.type === "emoji" ? (
-              <div><Label>Emoji</Label><Input value={form.emoji} onChange={(e) => setForm((f) => ({ ...f, emoji: e.target.value }))} className="text-2xl" /></div>
+              <div><Label>Emoji</Label><Input value={form.emoji || ""} onChange={(e) => setForm((f) => ({ ...f, emoji: e.target.value }))} className="text-2xl" /></div>
             ) : (
               <div>
                 <Label>Upload Icon (SVG/PNG)</Label>

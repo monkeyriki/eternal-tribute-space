@@ -12,8 +12,8 @@ interface OwnerTributeActionsProps {
 const OwnerTributeActions = ({ tributeId, status, onActionComplete }: OwnerTributeActionsProps) => {
   const handleApprove = async () => {
     const { error } = await supabase
-      .from("tributes" as any)
-      .update({ status: "approved" } as any)
+      .from("tributes")
+      .update({ status: "approved" })
       .eq("id", tributeId);
     if (error) {
       toast.error("Failed to approve tribute");
@@ -25,8 +25,8 @@ const OwnerTributeActions = ({ tributeId, status, onActionComplete }: OwnerTribu
 
   const handleFlag = async () => {
     const { error } = await supabase
-      .from("tributes" as any)
-      .update({ status: "flagged" } as any)
+      .from("tributes")
+      .update({ status: "flagged" })
       .eq("id", tributeId);
     if (error) {
       toast.error("Failed to flag tribute");
@@ -38,7 +38,7 @@ const OwnerTributeActions = ({ tributeId, status, onActionComplete }: OwnerTribu
 
   const handleDelete = async () => {
     const { error } = await supabase
-      .from("tributes" as any)
+      .from("tributes")
       .delete()
       .eq("id", tributeId);
     if (error) {

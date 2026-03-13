@@ -37,11 +37,11 @@ const PlansSettingsTab = () => {
   }, [settings]);
 
   const saveSetting = async (key: string, value: string) => {
-    const { data: existing } = await supabase.from("site_settings" as any).select("id").eq("key", key).maybeSingle();
+    const { data: existing } = await supabase.from("site_settings").select("id").eq("key", key).maybeSingle();
     if (existing) {
-      await supabase.from("site_settings" as any).update({ value } as any).eq("key", key);
+      await supabase.from("site_settings").update({ value }).eq("key", key);
     } else {
-      await supabase.from("site_settings" as any).insert({ key, value } as any);
+      await supabase.from("site_settings").insert({ key, value });
     }
   };
 

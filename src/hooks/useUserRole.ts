@@ -18,16 +18,17 @@ export const useUserRole = () => {
     }
 
     const fetchRoles = async () => {
-      // Only check user_roles table (secure, RLS-protected)
-      const { data: userRoles } = await supabase
-        .from("user_roles" as any)
+      const { data: profile } = await supabase
+        .from("profiles")
         .select("role")
-        .eq("user_id", user.id);
+        .eq("id", user.id)
+        .single();
 
-      const allRoles = new Set<AppRole>();
-      (userRoles as any[])?.forEach((r: any) => allRoles.add(r.role as AppRole));
-
-      setRoles(Array.from(allRoles));
+      if (profile?.role) {
+        setRoles([profile.role as AppRole]);
+      } else {
+        setRoles([]);
+      }
       setLoading(false);
     };
 

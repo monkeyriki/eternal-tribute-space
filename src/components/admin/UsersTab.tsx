@@ -23,15 +23,16 @@ const UsersTab = () => {
   const { data: profiles = [], isLoading } = useQuery({
     queryKey: ["admin-profiles"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("profiles" as any).select("*").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
       if (error) throw error;
-      return (data as any[]) || [];
+      return data || [];
     },
   });
 
   const { data: bannedUsers = [] } = useQuery({
     queryKey: ["banned_users"],
     queryFn: async () => {
+<<<<<<< HEAD
       try {
         const { data, error } = await supabase.from("banned_users" as any).select("*");
         if (error) throw error;
@@ -45,15 +46,20 @@ const UsersTab = () => {
       } catch {
         return [];
       }
+=======
+      const { data } = await supabase.from("banned_users").select("*").order("banned_at", { ascending: false });
+      return data || [];
+>>>>>>> f11194c3a55609d27f2817971afc2a5d5910b4b3
     },
   });
 
   const changeRoleMutation = useMutation({
     mutationFn: async ({ userId, newRole }: { userId: string; newRole: string }) => {
-      await supabase.from("user_roles" as any).delete().eq("user_id", userId);
-      const { error } = await supabase.from("user_roles" as any).insert({ user_id: userId, role: newRole as any } as any);
+      const { error } = await supabase
+        .from("profiles")
+        .update({ role: newRole })
+        .eq("id", userId);
       if (error) throw error;
-      await supabase.from("profiles" as any).update({ role: newRole as any } as any).eq("id", userId);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-profiles"] });
@@ -64,7 +70,7 @@ const UsersTab = () => {
 
   const banMutation = useMutation({
     mutationFn: async ({ email, reason, ip_address }: { email: string; reason: string; ip_address?: string }) => {
-      const { error } = await supabase.from("banned_users" as any).insert({ email, reason, ip_address: ip_address || null } as any);
+      const { error } = await supabase.from("banned_users").insert({ email, reason, ip_address: ip_address || null });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -83,7 +89,7 @@ const UsersTab = () => {
 
   const unbanMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("banned_users" as any).delete().eq("id", id);
+      const { error } = await supabase.from("banned_users").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -129,7 +135,11 @@ const UsersTab = () => {
                             <SelectItem value="admin">Admin</SelectItem>
                           </SelectContent>
                         </Select>
+<<<<<<< HEAD
                         <Button size="sm" variant="destructive" onClick={() => setBanDialog({ open: true, email: p.email || p.id })}>
+=======
+                        <Button size="sm" variant="destructive" onClick={() => setBanDialog({ open: true, email: p.email || "" })}>
+>>>>>>> f11194c3a55609d27f2817971afc2a5d5910b4b3
                           <Ban className="mr-1 h-3 w-3" /> Ban
                         </Button>
                       </TableCell>
@@ -164,7 +174,7 @@ const UsersTab = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {bannedUsers.map((b: any) => (
+                  {bannedUsers.map((b) => (
                      <TableRow key={b.id}>
                        <TableCell className="font-medium">{b.email || "—"}</TableCell>
                        <TableCell>{b.ip_address || "—"}</TableCell>

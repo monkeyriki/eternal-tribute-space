@@ -52,18 +52,17 @@ const MemorialDetail = () => {
   const { data: memorial, isLoading } = useQuery({
     queryKey: ["memorial", id],
     queryFn: async () => {
-      // First try direct table access (works for owners & admins via RLS)
       const { data, error } = await supabase
-        .from("memorials" as any)
+        .from("memorials")
         .select("*")
         .eq("id", id!)
-        .single();
-      if (!error && data) return { ...(data as any), has_password: !!(data as any).password_hash };
-      
-      // Fallback to public RPC (excludes password_hash, works for everyone)
-      const { data: pubData, error: pubError }: any = await (supabase.rpc as any)("get_memorial_public", { _memorial_id: id! });
-      if (pubError || !pubData || pubData.length === 0) return null;
-      return pubData[0];
+        .maybeSingle();
+      if (error) {
+        console.error("Memorial fetch error:", error);
+        return null;
+      }
+      if (!data) return null;
+      return { ...data, has_password: !!data.password_hash };
     },
     enabled: !!id,
   });
@@ -71,18 +70,18 @@ const MemorialDetail = () => {
   // Track page view
   useEffect(() => {
     if (!id) return;
-    supabase.from("memorial_views" as any).insert({ memorial_id: id } as any).then();
+    supabase.from("memorial_views").insert({ memorial_id: id }).then();
   }, [id]);
 
   const { data: tributes = [], refetch: refetchTributes } = useQuery({
     queryKey: ["tributes", id],
     queryFn: async () => {
       const { data } = await supabase
-        .from("tributes" as any)
+        .from("tributes")
         .select("*")
         .eq("memorial_id", id!)
         .order("created_at", { ascending: false });
-      return (data as any[]) || [];
+      return data || [];
     },
     enabled: !!id,
   });
@@ -91,11 +90,11 @@ const MemorialDetail = () => {
     queryKey: ["memorial_images", id],
     queryFn: async () => {
       const { data } = await supabase
-        .from("memorial_images" as any)
+        .from("memorial_images")
         .select("*")
         .eq("memorial_id", id!)
         .order("sort_order", { ascending: true });
-      return (data || []).map((img: any) => ({
+      return (data || []).map((img) => ({
         id: img.id,
         url: img.url,
         caption: img.caption || "",
@@ -118,11 +117,16 @@ const MemorialDetail = () => {
     if (!reportReason || !id) return;
     setReporting(true);
     try {
-      const { error } = await supabase.from("memorial_reports" as any).insert({
+      const { error } = await supabase.from("memorial_reports").insert({
         memorial_id: id,
         reason: reportReason,
         details: reportDetails || null,
+<<<<<<< HEAD
       } as any);
+=======
+        reporter_ip: window.location.hostname,
+      });
+>>>>>>> f11194c3a55609d27f2817971afc2a5d5910b4b3
       if (error) throw error;
       toast.success("Thank you, your report has been submitted for review.");
       setShowReport(false);
@@ -156,7 +160,7 @@ const MemorialDetail = () => {
     );
   }
 
-  const isPasswordProtected = memorial.visibility === "password" && (memorial as any).has_password;
+  const isPasswordProtected = memorial.visibility === "password" && memorial.has_password;
   if (isPasswordProtected && !passwordUnlocked) {
     const name = memorial.last_name
       ? `${memorial.first_name} ${memorial.last_name}`
@@ -166,13 +170,18 @@ const MemorialDetail = () => {
         <PasswordGate
 memorialName={name}
           onUnlock={async (password: string) => {
-            const { data, error }: any = await (supabase.rpc as any)("verify_memorial_password", {
+            const { data, error } = await supabase.rpc("verify_memorial_password", {
               _memorial_id: id!,
               _attempt: password,
             });
             if (data === true && !error) {
               setPasswordUnlocked(true);
+<<<<<<< HEAD
               return true;
+=======
+            } else {
+              toast.error("Wrong password. Please try again.");
+>>>>>>> f11194c3a55609d27f2817971afc2a5d5910b4b3
             }
             return false;
           }}
@@ -200,7 +209,7 @@ memorialName={name}
     try {
       // 1. Fetch all gallery images to get storage paths
       const { data: galleryImages } = await supabase
-        .from("memorial_images" as any)
+        .from("memorial_images")
         .select("url")
         .eq("memorial_id", memorial.id);
 
@@ -208,7 +217,7 @@ memorialName={name}
 
       // Collect gallery image paths
       if (galleryImages) {
-        for (const img of (galleryImages as any[])) {
+        for (const img of galleryImages) {
           const path = extractStoragePath(img.url);
           if (path) storagePaths.push(path);
         }
@@ -229,9 +238,9 @@ memorialName={name}
       }
 
       // 3. Delete DB rows
-      await supabase.from("tributes" as any).delete().eq("memorial_id", memorial.id);
-      await supabase.from("memorial_images" as any).delete().eq("memorial_id", memorial.id);
-      const { error } = await supabase.from("memorials" as any).delete().eq("id", memorial.id);
+      await supabase.from("tributes").delete().eq("memorial_id", memorial.id);
+      await supabase.from("memorial_images").delete().eq("memorial_id", memorial.id);
+      const { error } = await supabase.from("memorials").delete().eq("id", memorial.id);
       if (error) throw error;
       toast.success("Memorial deleted");
       navigate(`/directory/${memorial.type}`);
@@ -252,7 +261,7 @@ memorialName={name}
   const ogDescription = memorial.bio?.slice(0, 155) || `Memorial dedicated to ${fullName}`;
   const embedUrl = getVideoEmbedUrl(memorial.video_url || "");
   const tags = memorial.tags || [];
-  const b2bLogo = (memorial as any).b2b_logo_url;
+  const b2bLogo = (memorial as any)?.b2b_logo_url;
 
   const isPublic = memorial.visibility === "public";
   const shouldNoIndex = !isPublic;
@@ -329,7 +338,7 @@ memorialName={name}
           </div>
         )}
 
-        <AdBanner position="top" memorialPlan={(memorial as any).plan} />
+        <AdBanner position="top" memorialPlan={memorial.plan} />
 
         <section className="container mx-auto px-4 py-8 md:py-12">
           <div className="mx-auto max-w-3xl">
@@ -549,19 +558,19 @@ memorialName={name}
                 memorialId={memorial.id}
                 firstName={memorial.first_name}
                 onTributeAdded={() => refetchTributes()}
-                requireApproval={!!(memorial as any).require_tribute_approval}
+                requireApproval={!!memorial.require_tribute_approval}
               />
             </div>
 
             <GuestbookList
-              tributes={tributes as any}
+              tributes={tributes}
               isOwner={isOwner}
               onTributeModerated={() => refetchTributes()}
             />
           </div>
         </section>
 
-        <AdBanner position="sidebar" memorialPlan={(memorial as any).plan} />
+        <AdBanner position="sidebar" memorialPlan={memorial.plan} />
       </Layout>
     </>
   );

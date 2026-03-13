@@ -27,6 +27,8 @@ import MyMemorials from "./pages/MyMemorials";
 import ResetPassword from "./pages/ResetPassword";
 import AboutUs from "./pages/AboutUs";
 import RouteChangeProgress from "./components/RouteChangeProgress";
+import CookieConsentBanner from "./components/CookieConsentBanner";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient({
   mutationCache: new MutationCache({
@@ -46,6 +48,7 @@ const App = () => (
           <NetworkStatus />
           <GlobalNetworkErrorHandler />
           <BrowserRouter>
+            <ScrollToTop />
             <RouteChangeProgress />
             <Routes>
               <Route path="/" element={<Index />} />
@@ -86,6 +89,7 @@ const App = () => (
               />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <CookieConsentBanner />
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>

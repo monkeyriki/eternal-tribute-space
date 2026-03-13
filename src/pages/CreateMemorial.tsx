@@ -86,7 +86,7 @@ const CreateMemorial = () => {
         image_url = urlData.publicUrl;
       }
 
-      const { data: memorial, error } = await supabase.from("memorials" as any).insert({
+      const { data: memorial, error } = await supabase.from("memorials").insert({
         user_id: user.id,
         type: form.type,
         first_name: form.first_name,
@@ -102,7 +102,7 @@ const CreateMemorial = () => {
         visibility: form.visibility,
         password_hash: form.visibility === "password" ? form.password_hash : "",
         require_tribute_approval: form.require_tribute_approval,
-      } as any).select("id").single() as any;
+      }).select("id").single();
 
       if (error) throw error;
 
@@ -131,12 +131,12 @@ const CreateMemorial = () => {
             .from("memorial-images")
             .getPublicUrl(path);
 
-          return supabase.from("memorial_images" as any).insert({
+          return supabase.from("memorial_images").insert({
             memorial_id: memorial.id,
             url: urlData.publicUrl,
             caption: img.caption,
             sort_order: index,
-          } as any);
+          });
         });
 
         try {

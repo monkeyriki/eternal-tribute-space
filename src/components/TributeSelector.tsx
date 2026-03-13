@@ -40,13 +40,13 @@ const TributeSelector = ({ memorialId, firstName, onTributeAdded, requireApprova
     queryKey: ["store_items_tribute"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("store_items" as any)
+        .from("store_items")
         .select("*")
         .eq("category", "tribute")
         .eq("is_active", true)
         .order("price", { ascending: true });
 
-      if (error || !data || (data as any[]).length === 0) {
+      if (error || !data || data.length === 0) {
         return fallbackTiers;
       }
 
@@ -61,7 +61,7 @@ const TributeSelector = ({ memorialId, firstName, onTributeAdded, requireApprova
         animated: false,
       };
 
-      const dbItems: TributeTier[] = (data as any[]).map((item: any) => ({
+      const dbItems: TributeTier[] = data.map((item) => ({
         id: item.id,
         tier: item.tier as "base" | "standard" | "premium",
         name: item.name,
@@ -88,8 +88,8 @@ const TributeSelector = ({ memorialId, firstName, onTributeAdded, requireApprova
 
   useEffect(() => {
     loadProfanityWords(async () => {
-      const { data } = await supabase.from("profanity_words" as any).select("word");
-      return ((data as any[]) || []).map((r: any) => r.word);
+      const { data } = await supabase.from("profanity_words").select("word");
+      return (data || []).map((r) => r.word);
     }).then(setProfanityWords);
   }, []);
 
@@ -170,7 +170,7 @@ const TributeSelector = ({ memorialId, firstName, onTributeAdded, requireApprova
       const isFlagged = checkProfanity(message, profanityWords);
       const tributeStatus = isFlagged ? "flagged" : requireApproval ? "pending" : "approved";
 
-      const { error } = await supabase.from("tributes" as any).insert({
+      const { error } = await supabase.from("tributes").insert({
         memorial_id: memorialId,
         sender_name: senderName.trim() || "Anonymous",
         message,
@@ -179,7 +179,7 @@ const TributeSelector = ({ memorialId, firstName, onTributeAdded, requireApprova
         is_paid: false,
         status: tributeStatus,
         sender_email: senderEmail.trim() || null,
-      } as any);
+      });
 
       if (error) {
         if (error.message?.includes("Rate limit exceeded")) {
@@ -206,6 +206,7 @@ const TributeSelector = ({ memorialId, firstName, onTributeAdded, requireApprova
           message,
           tier: selected.tier,
           is_flagged: isFlagged,
+          is_pending_approval: !isFlagged && requireApproval,
         },
       }).catch((err) => console.error("notify-tribute error:", err));
 
