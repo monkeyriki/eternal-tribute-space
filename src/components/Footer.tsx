@@ -2,6 +2,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import flameIcon from "@/assets/flame-icon.png";
 
+const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
 const Footer = React.forwardRef<HTMLElement>((_, ref) => {
   return (
     <footer ref={ref} role="contentinfo" className="border-t border-border bg-card">
@@ -9,7 +11,7 @@ const Footer = React.forwardRef<HTMLElement>((_, ref) => {
         <div className="grid gap-10 md:grid-cols-3">
           {/* Brand */}
           <div>
-            <Link to="/" className="mb-3 flex items-center gap-2" aria-label="Eternal Memory - Home">
+            <Link to="/" className="mb-3 flex items-center gap-2" aria-label="Eternal Memory - Home" onClick={scrollToTop}>
               <img src={flameIcon} alt="Flame" className="h-7 w-7" />
               <span className="font-display text-xl font-bold text-foreground">
                 Eternal Memory
@@ -27,9 +29,9 @@ const Footer = React.forwardRef<HTMLElement>((_, ref) => {
                 Useful Links
               </h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/directory/human" className="transition-colors hover:text-primary">Memorials</Link></li>
-                <li><Link to="/directory/pet" className="transition-colors hover:text-primary">Pet Memorials</Link></li>
-                <li><Link to="/create" className="transition-colors hover:text-primary">Create Memorial</Link></li>
+                <li><Link to="/directory/human" className="transition-colors hover:text-primary" onClick={scrollToTop}>Memorials</Link></li>
+                <li><Link to="/directory/pet" className="transition-colors hover:text-primary" onClick={scrollToTop}>Pet Memorials</Link></li>
+                <li><Link to="/create" className="transition-colors hover:text-primary" onClick={scrollToTop}>Create Memorial</Link></li>
               </ul>
             </div>
             <div>
@@ -37,9 +39,9 @@ const Footer = React.forwardRef<HTMLElement>((_, ref) => {
                 Resources
               </h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link to="/privacy" className="transition-colors hover:text-primary">Privacy</Link></li>
-                <li><Link to="/cookie-policy" className="transition-colors hover:text-primary">Cookie Policy</Link></li>
-                <li><Link to="/settings" className="transition-colors hover:text-primary">Account</Link></li>
+                <li><Link to="/privacy" className="transition-colors hover:text-primary" onClick={scrollToTop}>Privacy</Link></li>
+                <li><Link to="/cookie-policy" className="transition-colors hover:text-primary" onClick={scrollToTop}>Cookie Policy</Link></li>
+                <li><Link to="/settings" className="transition-colors hover:text-primary" onClick={scrollToTop}>Account</Link></li>
               </ul>
             </div>
           </nav>

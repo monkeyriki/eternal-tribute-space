@@ -208,3 +208,11 @@
     }
   }
 }
+
+/* NProgress route-change bar: muted warm gold to match site */
+#nprogress .bar {
+  background: hsl(var(--warm-gold) / 0.9) !important;
+}
+#nprogress .peg {
+  box-shadow: 0 0 10px hsl(var(--warm-gold)), 0 0 5px hsl(var(--warm-gold)) !important;
+}

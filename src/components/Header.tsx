@@ -9,7 +9,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 
 const NAV_LINKS = [
   { to: "/", label: "Home" },
-  { to: "/#about", label: "About Us" },
+  { to: "/about", label: "About Us" },
   { to: "/directory/human", label: "Memorials" },
   { to: "/directory/pet", label: "Pet Memorials" },
   { to: "/pricing", label: "Pricing" },

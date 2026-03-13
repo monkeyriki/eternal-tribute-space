@@ -45,8 +45,11 @@ const ModerationTab = () => {
 
   const approveMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error }: any = await (supabase.rpc as any)("admin_approve_tribute", { tribute_id: id });
-      if (error) throw new Error("An RPC function is needed to approve. For now, delete inappropriate tributes.");
+      const { error } = await supabase
+        .from("tributes" as any)
+        .update({ status: "approved" } as any)
+        .eq("id", id);
+      if (error) throw error;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-flagged-tributes"] });

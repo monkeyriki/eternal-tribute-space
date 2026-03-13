@@ -139,7 +139,18 @@ const CreateMemorial = () => {
           } as any);
         });
 
-        await Promise.all(uploads);
+        try {
+          await Promise.all(uploads);
+        } catch (galleryErr) {
+          await supabase.from("memorials" as any).delete().eq("id", memorial.id);
+          toast({
+            title: "Gallery upload failed",
+            description:
+              "We couldn't upload some of your gallery photos. The memorial was not saved so you can try again.",
+            variant: "destructive",
+          });
+          return;
+        }
       }
 
       toast({

@@ -9,6 +9,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Layout from "@/components/Layout";
 import MultiImageUpload from "@/components/MultiImageUpload";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { compressImage } from "@/lib/imageCompression";
@@ -24,6 +25,7 @@ interface GalleryItem {
 const EditMemorial = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const { hasRole, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -89,7 +91,7 @@ const EditMemorial = () => {
         visibility: memorial.visibility || "public",
         tags: (memorial.tags || []).join(", "),
         video_url: memorial.video_url || "",
-        password_hash: memorial.password_hash || "",
+        password_hash: "",
         is_draft: memorial.is_draft,
         require_tribute_approval: (memorial as any).require_tribute_approval || false,
       });
@@ -123,7 +125,9 @@ const EditMemorial = () => {
 
   const handleSubmit = async (isDraft: boolean) => {
     if (!user || !memorial) return;
-    if (memorial.user_id !== user.id) {
+    const isOwner = memorial.user_id === user.id;
+    const isAdmin = hasRole("admin");
+    if (!isOwner && !isAdmin) {
       toast.error("You don't have permission to edit this memorial");
       return;
     }
@@ -146,25 +150,32 @@ const EditMemorial = () => {
         image_url = urlData.publicUrl;
       }
 
+      const updates: any = {
+        type: form.type,
+        first_name: form.first_name,
+        last_name: form.last_name,
+        bio: form.bio,
+        birth_date: form.birth_date || null,
+        death_date: form.death_date || null,
+        location: form.location,
+        image_url,
+        video_url: form.video_url || "",
+        tags: form.tags ? form.tags.split(",").map((t) => t.trim()) : [],
+        is_draft: isDraft,
+        visibility: form.visibility,
+        require_tribute_approval: form.require_tribute_approval,
+        updated_at: new Date().toISOString(),
+      };
+
+      if (form.visibility !== "password") {
+        updates.password_hash = "";
+      } else if (form.password_hash.trim()) {
+        updates.password_hash = form.password_hash;
+      }
+
       const { error } = await supabase
         .from("memorials" as any)
-        .update({
-          type: form.type,
-          first_name: form.first_name,
-          last_name: form.last_name,
-          bio: form.bio,
-          birth_date: form.birth_date || null,
-          death_date: form.death_date || null,
-          location: form.location,
-          image_url,
-          video_url: form.video_url || "",
-          tags: form.tags ? form.tags.split(",").map((t) => t.trim()) : [],
-          is_draft: isDraft,
-          visibility: form.visibility,
-          password_hash: form.visibility === "password" ? form.password_hash : "",
-          require_tribute_approval: form.require_tribute_approval,
-          updated_at: new Date().toISOString(),
-        } as any)
+        .update(updates)
         .eq("id", memorial.id);
 
       if (error) throw error;
@@ -233,7 +244,16 @@ const EditMemorial = () => {
     );
   }
 
-  if (user && memorial.user_id !== user.id) {
+  const isOwner = user && memorial.user_id === user.id;
+  const isAdmin = hasRole("admin");
+  if (user && !isOwner && (roleLoading || !isAdmin)) {
+    if (roleLoading) {
+      return (
+        <Layout>
+          <div className="container mx-auto px-4 py-20 text-center text-muted-foreground">Loading...</div>
+        </Layout>
+      );
+    }
     return (
       <Layout>
         <div className="container mx-auto px-4 py-20 text-center">
@@ -497,7 +517,7 @@ const EditMemorial = () => {
                 </button>
                 <button
                   onClick={() => handleSubmit(false)}
-                  disabled={submitting || !form.first_name || (form.visibility === "password" && !form.password_hash)}
+                  disabled={submitting || !form.first_name}
                   className="flex items-center justify-center gap-2 rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
                 >
                   <Eye className="h-4 w-4" />

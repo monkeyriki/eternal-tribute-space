@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
       .from("store_items")
       .select("price, name")
       .eq("tier", tier)
-      .eq("type", item_type || "candle")
+      .eq("name", item_type || "Candle")
       .eq("is_active", true)
       .single();
 

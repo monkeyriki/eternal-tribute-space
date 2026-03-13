@@ -32,8 +32,19 @@ const UsersTab = () => {
   const { data: bannedUsers = [] } = useQuery({
     queryKey: ["banned_users"],
     queryFn: async () => {
-      const { data } = await supabase.from("banned_users" as any).select("*").order("created_at", { ascending: false });
-      return (data as any[]) || [];
+      try {
+        const { data, error } = await supabase.from("banned_users" as any).select("*");
+        if (error) throw error;
+        const list = (data as any[]) || [];
+        list.sort((a, b) => {
+          const ta = new Date(a.banned_at ?? a.created_at ?? 0).getTime();
+          const tb = new Date(b.banned_at ?? b.created_at ?? 0).getTime();
+          return tb - ta;
+        });
+        return list;
+      } catch {
+        return [];
+      }
     },
   });
 
@@ -57,11 +68,15 @@ const UsersTab = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["banned_users"] });
-      setBanDialog({ open: false, email: "" });
-      setBanReason("");
-      setBanIpAddress("");
-      toast({ title: "User banned" });
+      try {
+        setBanDialog({ open: false, email: "" });
+        setBanReason("");
+        setBanIpAddress("");
+        toast({ title: "User banned" });
+        qc.invalidateQueries({ queryKey: ["banned_users"] });
+      } catch (e) {
+        toast({ title: "Error", description: "Something went wrong after banning.", variant: "destructive" });
+      }
     },
     onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),
   });
@@ -114,7 +129,7 @@ const UsersTab = () => {
                             <SelectItem value="admin">Admin</SelectItem>
                           </SelectContent>
                         </Select>
-                        <Button size="sm" variant="destructive" onClick={() => setBanDialog({ open: true, email: p.full_name || p.id })}>
+                        <Button size="sm" variant="destructive" onClick={() => setBanDialog({ open: true, email: p.email || p.id })}>
                           <Ban className="mr-1 h-3 w-3" /> Ban
                         </Button>
                       </TableCell>
@@ -154,7 +169,7 @@ const UsersTab = () => {
                        <TableCell className="font-medium">{b.email || "—"}</TableCell>
                        <TableCell>{b.ip_address || "—"}</TableCell>
                        <TableCell>{b.reason || "—"}</TableCell>
-                       <TableCell>{format(new Date(b.banned_at), "dd MMM yyyy", { locale: enUS })}</TableCell>
+                       <TableCell>{format(new Date(b.banned_at ?? b.created_at ?? Date.now()), "dd MMM yyyy", { locale: enUS })}</TableCell>
                       <TableCell className="text-right">
                         <Button size="sm" variant="outline" onClick={() => unbanMutation.mutate(b.id)}>Remove Ban</Button>
                       </TableCell>

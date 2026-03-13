@@ -7,10 +7,13 @@ interface ShareButtonsProps {
 }
 
 const ShareButtons = ({ url, title, memorialId }: ShareButtonsProps) => {
-  // Use OG edge function URL for social sharing so crawlers get proper meta tags
-  const ogUrl = memorialId
-    ? `https://mfzufzajsybdgdlhjkie.supabase.co/functions/v1/og-memorial?id=${memorialId}`
-    : url;
+  // Use OG edge function URL for social sharing so crawlers get proper meta tags.
+  // Build the base from the Supabase URL env so it survives project migrations.
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+  const ogUrl =
+    memorialId && supabaseUrl
+      ? `${supabaseUrl.replace(/\/+$/, "")}/functions/v1/og-memorial?id=${memorialId}`
+      : url;
   const encodedOgUrl = encodeURIComponent(ogUrl);
   const encodedTitle = encodeURIComponent(title);
 

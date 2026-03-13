@@ -50,6 +50,13 @@ Deno.serve(async (req) => {
     const pageUrl = `https://forever-flame-tributes.lovable.app/memorial/${memorialId}`;
     const siteName = "Eternal Memory";
 
+    const userAgent = req.headers.get("user-agent") ?? "";
+    const isCrawler = isSocialCrawler(userAgent);
+
+    if (!isCrawler) {
+      return Response.redirect(pageUrl, 302);
+    }
+
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -71,12 +78,10 @@ Deno.serve(async (req) => {
   <meta name="twitter:description" content="${escapeHtml(description)}">
   <meta name="twitter:image" content="${escapeHtml(imageUrl)}">
 
-  <!-- Redirect real users to the SPA -->
-  <meta http-equiv="refresh" content="0;url=${escapeHtml(pageUrl)}">
   <link rel="canonical" href="${escapeHtml(pageUrl)}">
 </head>
 <body>
-  <p>Redirecting to <a href="${escapeHtml(pageUrl)}">${escapeHtml(title)}</a>...</p>
+  <p><a href="${escapeHtml(pageUrl)}">${escapeHtml(title)}</a> – ${siteName}</p>
 </body>
 </html>`;
 
@@ -91,6 +96,23 @@ Deno.serve(async (req) => {
     return new Response("Internal error", { status: 500 });
   }
 });
+
+function isSocialCrawler(userAgent: string): boolean {
+  const ua = userAgent.toLowerCase();
+  return (
+    ua.includes("facebookexternalhit") ||
+    ua.includes("facebot") ||
+    ua.includes("twitterbot") ||
+    ua.includes("linkedinbot") ||
+    ua.includes("whatsapp") ||
+    ua.includes("telegrambot") ||
+    ua.includes("slackbot") ||
+    ua.includes("discordbot") ||
+    ua.includes("pinterest") ||
+    ua.includes("googlebot") ||
+    ua.includes("bingbot")
+  );
+}
 
 function escapeHtml(str: string): string {
   return str

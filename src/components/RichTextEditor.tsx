@@ -1,9 +1,12 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import BulletList from "@tiptap/extension-bullet-list";
+import ListItem from "@tiptap/extension-list-item";
+import OrderedList from "@tiptap/extension-ordered-list";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Bold, Italic, List, ListOrdered, Link as LinkIcon, Undo, Redo } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 interface RichTextEditorProps {
   value: string;
@@ -37,11 +40,18 @@ const ToolbarButton = ({
 );
 
 const RichTextEditor = ({ value, onChange, placeholder }: RichTextEditorProps) => {
+  const hasSyncedInitialValue = useRef(false);
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
         heading: { levels: [2, 3] },
+        bulletList: false,
+        orderedList: false,
+        listItem: false,
       }),
+      BulletList,
+      OrderedList,
+      ListItem,
       Link.configure({
         openOnClick: false,
         HTMLAttributes: { class: "text-primary underline" },
@@ -62,12 +72,14 @@ const RichTextEditor = ({ value, onChange, placeholder }: RichTextEditorProps) =
     },
   });
 
-  // Sync external value changes (e.g. when loading existing data)
+  // Sync external value only once when initial data loads (e.g. from API). After that, editor is source of truth.
   useEffect(() => {
-    if (editor && value !== editor.getHTML() && value !== undefined) {
+    if (hasSyncedInitialValue.current || !editor || value === undefined) return;
+    if (value !== editor.getHTML()) {
       editor.commands.setContent(value, { emitUpdate: false });
     }
-  }, [value]); // eslint-disable-line react-hooks/exhaustive-deps
+    hasSyncedInitialValue.current = true;
+  }, [editor, value]);
 
   if (!editor) return null;
 

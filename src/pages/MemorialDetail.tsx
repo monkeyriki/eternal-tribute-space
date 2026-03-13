@@ -122,7 +122,6 @@ const MemorialDetail = () => {
         memorial_id: id,
         reason: reportReason,
         details: reportDetails || null,
-        reporter_ip: window.location.hostname,
       } as any);
       if (error) throw error;
       toast.success("Thank you, your report has been submitted for review.");
@@ -171,9 +170,11 @@ memorialName={name}
               _memorial_id: id!,
               _attempt: password,
             });
-            if (data && !error) {
+            if (data === true && !error) {
               setPasswordUnlocked(true);
+              return true;
             }
+            return false;
           }}
         />
       </Layout>

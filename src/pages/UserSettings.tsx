@@ -92,13 +92,27 @@ const UserSettings = () => {
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const accessToken = sessionData?.session?.access_token;
-      if (!accessToken) throw new Error("No active session");
+      if (!accessToken) {
+        toast({ title: "Export failed", description: "No active session. Please sign in again.", variant: "destructive" });
+        return;
+      }
 
       const { data, error } = await supabase.functions.invoke("export-data", {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
 
-      if (error) throw error;
+      if (error) {
+        toast({ title: "Export failed", description: error.message || "Could not export your data.", variant: "destructive" });
+        return;
+      }
+      if (data?.error) {
+        toast({ title: "Export failed", description: typeof data.error === "string" ? data.error : "The server could not prepare your export.", variant: "destructive" });
+        return;
+      }
+      if (!data || typeof data !== "object") {
+        toast({ title: "Export failed", description: "Invalid response. Please try again.", variant: "destructive" });
+        return;
+      }
 
       const blob = new Blob([JSON.stringify(data, null, 2)], {
         type: "application/json",
@@ -114,10 +128,10 @@ const UserSettings = () => {
 
       toast({
         title: "Export ready",
-        description: "We downloaded a copy of your data as a JSON file.",
+        description: "Your data has been downloaded as a JSON file.",
       });
     } catch (e: any) {
-      sonnerToast.error(e.message || "Failed to export data");
+      toast({ title: "Export failed", description: e.message || "Something went wrong. Please try again.", variant: "destructive" });
     } finally {
       setExporting(false);
     }

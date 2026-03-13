@@ -1,10 +1,14 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, MutationCache } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
+import { toast } from "sonner";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { isNetworkError, FRIENDLY_NETWORK_MESSAGE } from "@/lib/networkError";
+import NetworkStatus from "./components/NetworkStatus";
+import GlobalNetworkErrorHandler from "./components/GlobalNetworkErrorHandler";
 import Index from "./pages/Index";
 import Directory from "./pages/Directory";
 import MemorialDetail from "./pages/MemorialDetail";
@@ -21,8 +25,16 @@ import UserSettings from "./pages/UserSettings";
 import PricingPage from "./pages/PricingPage";
 import MyMemorials from "./pages/MyMemorials";
 import ResetPassword from "./pages/ResetPassword";
+import AboutUs from "./pages/AboutUs";
+import RouteChangeProgress from "./components/RouteChangeProgress";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  mutationCache: new MutationCache({
+    onError: (error) => {
+      if (isNetworkError(error)) toast.error(FRIENDLY_NETWORK_MESSAGE);
+    },
+  }),
+});
 
 const App = () => (
   <HelmetProvider>
@@ -31,13 +43,24 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <NetworkStatus />
+          <GlobalNetworkErrorHandler />
           <BrowserRouter>
+            <RouteChangeProgress />
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/about" element={<AboutUs />} />
               <Route path="/directory/:type" element={<Directory />} />
               <Route path="/memorial/:id" element={<MemorialDetail />} />
               <Route path="/auth" element={<Auth />} />
-              <Route path="/create" element={<CreateMemorial />} />
+              <Route
+                path="/create"
+                element={
+                  <ProtectedRoute>
+                    <CreateMemorial />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/memorial/:id/edit" element={<EditMemorial />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/cookie-policy" element={<CookiePolicy />} />

@@ -102,22 +102,19 @@ Deno.serve(async (req) => {
           if (memorialError) {
             console.error("Failed to fetch memorial for owner notification:", memorialError);
           } else if (memorial) {
-            // Get owner's email from profiles table
+            // Get owner's email from auth.users (profiles has no email column)
             let ownerEmail: string | null = null;
             try {
-              const { data: profile, error: profileError } = await supabase
-                .from("profiles")
-                .select("email")
-                .eq("id", (memorial as any).user_id)
-                .maybeSingle();
-
-              if (profileError) {
-                console.error("Failed to fetch owner profile for tribute email:", profileError);
+              const { data: authUser, error: authError } = await supabase.auth.admin.getUserById(
+                (memorial as any).user_id
+              );
+              if (authError) {
+                console.error("Failed to fetch owner for tribute email:", authError);
               } else {
-                ownerEmail = (profile as any)?.email ?? null;
+                ownerEmail = authUser?.user?.email ?? null;
               }
             } catch (ownerErr) {
-              console.error("Failed to fetch owner profile:", ownerErr);
+              console.error("Failed to fetch owner for tribute email:", ownerErr);
             }
 
             if (ownerEmail) {

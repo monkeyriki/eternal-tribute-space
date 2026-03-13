@@ -30,7 +30,10 @@ const MemorialCard = ({ memorial }: MemorialCardProps) => {
         <div className="mb-3 flex items-center gap-1 text-xs text-muted-foreground">
           <MapPin className="h-3 w-3" /><span>{memorial.location}</span>
         </div>
-        <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{memorial.bio}</p>
+        <div
+          className="mb-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground prose prose-sm max-w-none [&_p]:my-0"
+          dangerouslySetInnerHTML={{ __html: memorial.bio || "" }}
+        />
         <div className="flex items-center gap-4 border-t border-border pt-3 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
             <Heart className="h-3.5 w-3.5 text-warm-gold" />{memorial.tributeCount} tributes
