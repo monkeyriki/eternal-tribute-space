@@ -152,16 +152,6 @@ const EditMemorial = () => {
 
   if (isLoading) return <Layout><div className="container mx-auto px-4 py-20 text-center text-muted-foreground">Loading...</div></Layout>;
   if (!memorial) return <Layout><div className="container mx-auto px-4 py-20 text-center"><h1 className="mb-4 font-serif text-3xl text-foreground">Memorial not found</h1><Link to="/" className="text-primary hover:underline">Return to Home</Link></div></Layout>;
-  // Allow admin or owner to edit
-  const { data: isAdminUser } = useQuery({
-    queryKey: ["is-admin-edit", user?.id],
-    queryFn: async () => {
-      if (!user) return false;
-      const { data } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" as any });
-      return !!data;
-    },
-    enabled: !!user,
-  });
   const canEdit = user && (memorial.user_id === user.id || isAdminUser);
   if (user && !canEdit) return <Layout><div className="container mx-auto px-4 py-20 text-center"><h1 className="mb-4 font-serif text-3xl text-foreground">Access denied</h1><p className="text-muted-foreground">You can only edit your own memorials.</p></div></Layout>;
 
