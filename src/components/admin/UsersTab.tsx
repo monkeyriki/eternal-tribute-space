@@ -115,7 +115,7 @@ const UsersTab = () => {
                             <SelectItem value="admin">Admin</SelectItem>
                           </SelectContent>
                         </Select>
-                        <Button size="sm" variant="destructive" onClick={() => setBanDialog({ open: true, email: p.full_name || p.id })}>
+                        <Button size="sm" variant="destructive" onClick={() => setBanDialog({ open: true, email: p.email || "" })}>
                           <Ban className="mr-1 h-3 w-3" /> Ban
                         </Button>
                       </TableCell>

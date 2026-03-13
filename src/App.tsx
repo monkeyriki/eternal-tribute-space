@@ -22,6 +22,7 @@ import PricingPage from "./pages/PricingPage";
 import MyMemorials from "./pages/MyMemorials";
 import ResetPassword from "./pages/ResetPassword";
 import CookieConsentBanner from "./components/CookieConsentBanner";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <ScrollToTop />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/directory/:type" element={<Directory />} />

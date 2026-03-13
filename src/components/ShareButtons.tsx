@@ -8,8 +8,9 @@ interface ShareButtonsProps {
 
 const ShareButtons = ({ url, title, memorialId }: ShareButtonsProps) => {
   // Use OG edge function URL for social sharing so crawlers get proper meta tags
-  const ogUrl = memorialId
-    ? `https://mfzufzajsybdgdlhjkie.supabase.co/functions/v1/og-memorial?id=${memorialId}`
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const ogUrl = memorialId && supabaseUrl
+    ? `${supabaseUrl}/functions/v1/og-memorial?id=${memorialId}`
     : url;
   const encodedOgUrl = encodeURIComponent(ogUrl);
   const encodedTitle = encodeURIComponent(title);

@@ -172,6 +172,8 @@ memorialName={name}
             });
             if (data && !error) {
               setPasswordUnlocked(true);
+            } else {
+              toast.error("Wrong password. Please try again.");
             }
           }}
         />
