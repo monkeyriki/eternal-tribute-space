@@ -16,7 +16,7 @@ import MemorialsTab from "@/components/admin/MemorialsTab";
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("users");
 
-  const { data: profiles = [] } = useQuery({
+  const { data: profiles = [], isError: profilesError, refetch: refetchProfiles } = useQuery({
     queryKey: ["admin-profiles"],
     queryFn: async () => {
       const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
@@ -59,6 +59,27 @@ const AdminPanel = () => {
     { label: "Flagged", value: flaggedCount, icon: Shield, tab: "moderation", color: "text-destructive" },
     { label: "Admin", value: profiles.filter((p) => p.role === "admin").length, icon: Shield, tab: "users", color: "" },
   ];
+
+  if (profilesError) {
+    return (
+      <Layout>
+        <Helmet><title>Admin Panel — Eternal Memory</title></Helmet>
+        <div className="container mx-auto py-10 px-4">
+          <div className="rounded-lg border border-border bg-card p-8 text-center">
+            <h2 className="text-lg font-semibold text-foreground mb-2">Unable to load admin data</h2>
+            <p className="text-muted-foreground text-sm mb-4">Something went wrong. You can try refreshing the page.</p>
+            <button
+              type="button"
+              onClick={() => refetchProfiles()}
+              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>

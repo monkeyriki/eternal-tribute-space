@@ -67,7 +67,7 @@ const RichTextEditor = ({ value, onChange, placeholder }: RichTextEditorProps) =
     editorProps: {
       attributes: {
         class:
-          "prose prose-sm max-w-none min-h-[120px] px-3 py-2.5 text-sm text-foreground focus:outline-none [&_p]:my-1 [&_ul]:my-1 [&_ol]:my-1 [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:mt-3 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mt-2",
+          "prose prose-sm max-w-none min-h-[120px] px-3 py-2.5 text-sm text-foreground focus:outline-none [&_p]:my-1 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-1 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:my-1 [&_li]:my-0.5 [&_strong]:font-bold [&_b]:font-bold [&_em]:italic [&_i]:italic [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:mt-3 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mt-2",
       },
     },
   });

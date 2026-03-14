@@ -1,12 +1,18 @@
 import { Heart, Users, Globe } from "lucide-react";
 
-const AboutSection = () => {
+interface AboutSectionProps {
+  /** Use h1 on the dedicated About page for correct document outline (Bug #9). */
+  asPageTitle?: boolean;
+}
+
+const AboutSection = ({ asPageTitle }: AboutSectionProps) => {
+  const Heading = asPageTitle ? "h1" : "h2";
   return (
-    <section id="about" className="py-20 bg-card">
+    <section id="about" className="py-20 bg-card" aria-labelledby="about-heading">
       <div className="container max-w-5xl">
-        <h2 className="font-display text-3xl md:text-4xl font-bold text-center text-foreground mb-4 uppercase tracking-wide">
+        <Heading id="about-heading" className="font-display text-3xl md:text-4xl font-bold text-center text-foreground mb-4 uppercase tracking-wide">
           About Us
-        </h2>
+        </Heading>
         <p className="text-center text-muted-foreground mb-14 max-w-2xl mx-auto">
           We believe every life deserves to be remembered. Our mission is to provide a respectful and lasting
           digital space where families and friends can preserve and share the memories of their loved ones.

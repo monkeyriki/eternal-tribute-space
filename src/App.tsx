@@ -64,12 +64,33 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              <Route path="/memorial/:id/edit" element={<EditMemorial />} />
+              <Route
+                path="/memorial/:id/edit"
+                element={
+                  <ProtectedRoute>
+                    <EditMemorial />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/cookie-policy" element={<CookiePolicy />} />
-              <Route path="/settings" element={<UserSettings />} />
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute>
+                    <UserSettings />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/pricing" element={<PricingPage />} />
-              <Route path="/my-memorials" element={<MyMemorials />} />
+              <Route
+                path="/my-memorials"
+                element={
+                  <ProtectedRoute>
+                    <MyMemorials />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route
                 path="/dashboard/b2b"

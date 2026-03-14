@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { STRIPE_PLANS, PlanKey } from "@/data/stripePlans";
 import { toast } from "sonner";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { getFriendlyErrorMessage } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 
 const plans = [
@@ -137,8 +138,8 @@ const PricingPage = () => {
         return;
       }
       throw new Error("No checkout URL");
-    } catch (err: any) {
-      toast.error("Failed to start checkout", { description: err.message });
+    } catch (err: unknown) {
+      toast.error(getFriendlyErrorMessage(err, "payment"));
     } finally {
       setLoadingPlan(null);
     }

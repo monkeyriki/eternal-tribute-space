@@ -21,6 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 import { BookOpen, Eye, Heart, Plus, Upload, Trash2, AlertTriangle, Image, Settings, Loader2 } from "lucide-react";
 import { STRIPE_PLANS } from "@/data/stripePlans";
 import { toast as sonnerToast } from "sonner";
+import { getFriendlyErrorMessage } from "@/lib/utils";
 import { format } from "date-fns";
 import { enUS } from "date-fns/locale";
 
@@ -206,8 +207,8 @@ const B2BDashboard = () => {
       });
       if (error || !data?.url) throw new Error(data?.error || "Failed to open portal");
       window.open(data.url, "_blank");
-    } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } catch (err: unknown) {
+      toast({ title: "Error", description: getFriendlyErrorMessage(err, "payment"), variant: "destructive" });
     }
   };
 
@@ -269,8 +270,8 @@ const B2BDashboard = () => {
                     if (error) throw error;
                     if (data?.url) { window.location.href = data.url; return; }
                     throw new Error("No checkout URL");
-                  } catch (err: any) {
-                    sonnerToast.error("Failed to start checkout", { description: err.message });
+                  } catch (err: unknown) {
+                    sonnerToast.error(getFriendlyErrorMessage(err, "payment"));
                   } finally {
                     setUpgradeLoading(false);
                   }

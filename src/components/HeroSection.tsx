@@ -4,18 +4,26 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
+import { useAuth } from "@/contexts/AuthContext";
 
 const HeroSection = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const handleStart = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
     if (firstName.trim()) params.set("first_name", firstName.trim());
     if (lastName.trim()) params.set("last_name", lastName.trim());
-    navigate(`/create?${params.toString()}`);
+    const query = params.toString();
+    const createPath = `/create${query ? `?${query}` : ""}`;
+    if (user) {
+      navigate(createPath);
+    } else {
+      navigate(`/auth?redirect=${encodeURIComponent(createPath)}`);
+    }
   };
 
   return (

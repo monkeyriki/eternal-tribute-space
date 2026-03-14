@@ -182,6 +182,7 @@ const TributeSelector = ({ memorialId, firstName, onTributeAdded, requireApprova
       });
 
       if (error) {
+        console.error("Tribute insert failed:", error.message, error.details, error.hint);
         if (error.message?.includes("Rate limit exceeded")) {
           toast.error("You have reached the limit of 3 free tributes per memorial per day.");
         } else {

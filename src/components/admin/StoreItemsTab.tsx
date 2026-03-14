@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { getFriendlyErrorMessage } from "@/lib/utils";
 import { Plus, Pencil, Trash2, Package } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -89,7 +90,7 @@ const StoreItemsTab = () => {
     const path = `icons/${Date.now()}-${file.name}`;
     const { error } = await supabase.storage.from("store-items").upload(path, file);
     if (error) {
-      toast({ title: "Upload error", description: error.message, variant: "destructive" });
+      toast({ title: "Upload error", description: getFriendlyErrorMessage(error, "image_upload"), variant: "destructive" });
       setUploading(false);
       return;
     }

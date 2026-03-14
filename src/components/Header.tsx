@@ -24,7 +24,7 @@ const Header = () => {
   const { isAdmin, isB2B } = useUserRole();
 
   const isActive = (path: string) => location.pathname === path;
-  const handleCreate = () => navigate(user ? "/create" : "/auth");
+  const handleCreate = () => navigate(user ? "/create" : "/auth?redirect=%2Fcreate");
   const handleSignOut = async () => {
     await signOut();
     navigate("/");
@@ -198,6 +198,13 @@ const Header = () => {
                     className="rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-secondary"
                   >
                     📖 My Memorials
+                  </Link>
+                  <Link
+                    to="/settings"
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-secondary"
+                  >
+                    ⚙️ Account
                   </Link>
                   {isAdmin && (
                     <Link

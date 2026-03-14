@@ -1,10 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import flameIcon from "@/assets/flame-icon.png";
+import { useAuth } from "@/contexts/AuthContext";
 
 const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
 const Footer = React.forwardRef<HTMLElement>((_, ref) => {
+  const { user } = useAuth();
+  const createMemorialTo = user ? "/create" : "/auth?redirect=%2Fcreate";
+
   return (
     <footer ref={ref} role="contentinfo" className="border-t border-border bg-card">
       <div className="container mx-auto px-4 py-12">
@@ -31,7 +35,7 @@ const Footer = React.forwardRef<HTMLElement>((_, ref) => {
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><Link to="/directory/human" className="transition-colors hover:text-primary" onClick={scrollToTop}>Memorials</Link></li>
                 <li><Link to="/directory/pet" className="transition-colors hover:text-primary" onClick={scrollToTop}>Pet Memorials</Link></li>
-                <li><Link to="/create" className="transition-colors hover:text-primary" onClick={scrollToTop}>Create Memorial</Link></li>
+                <li><Link to={createMemorialTo} className="transition-colors hover:text-primary" onClick={scrollToTop}>Create Memorial</Link></li>
               </ul>
             </div>
             <div>
@@ -39,6 +43,7 @@ const Footer = React.forwardRef<HTMLElement>((_, ref) => {
                 Resources
               </h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><Link to="/about" className="transition-colors hover:text-primary" onClick={scrollToTop}>About Us</Link></li>
                 <li><Link to="/privacy" className="transition-colors hover:text-primary" onClick={scrollToTop}>Privacy</Link></li>
                 <li><Link to="/cookie-policy" className="transition-colors hover:text-primary" onClick={scrollToTop}>Cookie Policy</Link></li>
                 <li><Link to="/settings" className="transition-colors hover:text-primary" onClick={scrollToTop}>Account</Link></li>

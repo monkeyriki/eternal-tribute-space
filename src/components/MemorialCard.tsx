@@ -31,7 +31,7 @@ const MemorialCard = ({ memorial }: MemorialCardProps) => {
           <MapPin className="h-3 w-3" /><span>{memorial.location}</span>
         </div>
         <div
-          className="mb-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground prose prose-sm max-w-none [&_p]:my-0"
+          className="mb-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground prose prose-sm max-w-none [&_p]:my-0 [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:my-0.5 [&_ol]:list-decimal [&_ol]:pl-4 [&_ol]:my-0.5 [&_li]:my-0 [&_strong]:font-bold [&_b]:font-bold [&_em]:italic [&_i]:italic"
           dangerouslySetInnerHTML={{ __html: memorial.bio || "" }}
         />
         <div className="flex items-center gap-4 border-t border-border pt-3 text-xs text-muted-foreground">

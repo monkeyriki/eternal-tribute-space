@@ -45,14 +45,7 @@ const ModerationTab = () => {
 
   const approveMutation = useMutation({
     mutationFn: async (id: string) => {
-<<<<<<< HEAD
-      const { error } = await supabase
-        .from("tributes" as any)
-        .update({ status: "approved" } as any)
-        .eq("id", id);
-=======
       const { error } = await supabase.rpc("admin_approve_tribute", { tribute_id: id });
->>>>>>> f11194c3a55609d27f2817971afc2a5d5910b4b3
       if (error) throw error;
     },
     onSuccess: () => {

@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, Link } from "react-router-dom";
 import { Search, SlidersHorizontal, MapPin, Calendar, Tag, ArrowUpDown, X } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { useQuery } from "@tanstack/react-query";
@@ -127,20 +127,22 @@ const Directory = () => {
             <span className="mb-2 inline-block text-3xl">{categoryEmoji}</span>
             <h1 className="mb-2 font-serif text-3xl font-semibold text-foreground md:text-4xl">{categoryLabel}</h1>
             <div className="mb-2 flex items-center justify-center gap-2">
-              <a
-                href="/directory/human"
+              <Link
+                to="/directory/human"
                 className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${isHuman ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground hover:text-foreground"}`}
                 aria-current={isHuman ? "page" : undefined}
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               >
                 🕊️ People
-              </a>
-              <a
-                href="/directory/pet"
+              </Link>
+              <Link
+                to="/directory/pet"
                 className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${!isHuman ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground hover:text-foreground"}`}
                 aria-current={!isHuman ? "page" : undefined}
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               >
                 🐾 Pets
-              </a>
+              </Link>
             </div>
             <p className="text-muted-foreground">
               {filtered.length} {filtered.length === 1 ? "memorial found" : "memorials found"}

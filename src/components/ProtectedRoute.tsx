@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
 
@@ -9,6 +9,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
+  const location = useLocation();
   const { user, loading: authLoading } = useAuth();
   const { hasRole, loading: roleLoading } = useUserRole();
 
@@ -20,7 +21,10 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
     );
   }
 
-  if (!user) return <Navigate to="/auth" replace />;
+  if (!user) {
+    const redirect = encodeURIComponent(location.pathname + location.search);
+    return <Navigate to={redirect ? `/auth?redirect=${redirect}` : "/auth"} replace />;
+  }
   if (requiredRole && !hasRole(requiredRole) && !hasRole("admin")) return <Navigate to="/" replace />;
 
   return <>{children}</>;

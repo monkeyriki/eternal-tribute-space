@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { supabase } from "@/integrations/supabase/client";
 import Layout from "@/components/Layout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { getFriendlyErrorMessage } from "@/lib/utils";
 
 const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [sessionReady, setSessionReady] = useState(false);
+  const [hasValidLink, setHasValidLink] = useState<boolean | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -22,12 +24,13 @@ const ResetPassword = () => {
     const refreshToken = params.get("refresh_token");
 
     if (accessToken && refreshToken) {
+      setHasValidLink(true);
       supabase.auth
         .setSession({ access_token: accessToken, refresh_token: refreshToken })
         .then(() => setSessionReady(true))
         .catch(() => setSessionReady(true));
     } else {
-      // If no tokens are present, still allow the user to try; Supabase will error if not authorized
+      setHasValidLink(false);
       setSessionReady(true);
     }
   }, []);
@@ -60,10 +63,10 @@ const ResetPassword = () => {
         description: "You can now sign in with your new password.",
       });
       navigate("/auth");
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast({
         title: "Reset failed",
-        description: err.message || "Unable to reset password. The link may have expired.",
+        description: getFriendlyErrorMessage(err, "password_reset"),
         variant: "destructive",
       });
     } finally {
@@ -85,6 +88,15 @@ const ResetPassword = () => {
             </p>
             {!sessionReady ? (
               <p className="text-sm text-muted-foreground">Preparing your session...</p>
+            ) : hasValidLink === false ? (
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Use the link from your password reset email to set a new password. If you didn&apos;t receive it or the link expired, request a new one from the sign-in page.
+                </p>
+                <Button asChild variant="outline" className="w-full">
+                  <Link to="/auth">Go to sign in</Link>
+                </Button>
+              </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>

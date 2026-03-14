@@ -3,9 +3,9 @@ import { useLocation } from "react-router-dom";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 
-NProgress.configure({ showSpinner: false });
+NProgress.configure({ showSpinner: false, minimum: 0.15 });
 
-// Start progress when an in-app link is clicked; finish when location changes.
+// Start progress when an in-app link is clicked; finish when location changes (Bug #8: visible when switching Human/Pet).
 const RouteChangeProgress = () => {
   const location = useLocation();
 

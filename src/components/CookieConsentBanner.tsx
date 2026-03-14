@@ -90,7 +90,7 @@ const CookieConsentBanner = () => {
               <p className="text-xs text-muted-foreground leading-relaxed mb-4">
                 Utilizziamo cookie tecnici necessari al funzionamento del sito. Con il tuo consenso,
                 potremmo usare anche cookie di analisi e pubblicità.{" "}
-                <Link to="/cookie-policy" className="underline text-primary hover:text-primary/80">
+                <Link to="/cookie-policy" className="underline text-primary hover:text-primary/80" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
                   Cookie Policy
                 </Link>
               </p>

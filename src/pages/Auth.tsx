@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { Mail, Lock, User, ArrowRight } from "lucide-react";
@@ -7,23 +7,38 @@ import Layout from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { getFriendlyErrorMessage } from "@/lib/utils";
 
 const Auth = () => {
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/";
+  const confirmed = searchParams.get("confirmed") === "1";
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [resetMode, setResetMode] = useState(false);
-  const { signIn, signUp } = useAuth();
+  const { user, signIn, signUp } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Bug #16: after email confirmation Supabase redirects to /auth?confirmed=1#...; once session is set, show success and redirect
+  useEffect(() => {
+    if (!confirmed || !user) return;
+    toast({
+      title: "Email confirmed",
+      description: "You're now signed in. Welcome!",
+    });
+    navigate(redirectTo.startsWith("/") ? redirectTo : "/", { replace: true });
+  }, [confirmed, user, redirectTo, navigate, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     try {
       if (resetMode) {
+        // Bug #17: Reset link must open your app. Add https://yourdomain.com/reset-password to Supabase → Auth → URL Configuration → Redirect URLs.
         await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/reset-password`,
         });
@@ -35,7 +50,7 @@ const Auth = () => {
       } else if (isLogin) {
         await signIn(email, password);
         toast({ title: "Welcome back!", description: "Signed in successfully." });
-        navigate("/");
+        navigate(redirectTo.startsWith("/") ? redirectTo : "/");
       } else {
         await signUp(email, password, fullName);
         toast({
@@ -43,16 +58,34 @@ const Auth = () => {
           description: "Check your email to confirm your account.",
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast({
         title: "Error",
-        description: error.message || "An error occurred.",
+        description: getFriendlyErrorMessage(error, "auth"),
         variant: "destructive",
       });
     } finally {
       setSubmitting(false);
     }
   };
+
+  // Bug #16: show brief "Confirming..." when landing from email confirmation link (session not yet set)
+  if (confirmed && !user) {
+    return (
+      <>
+        <Helmet><title>Confirming email – Eternal Memory</title></Helmet>
+        <Layout>
+          <div className="flex min-h-[70vh] items-center justify-center px-4 py-16">
+            <div className="text-center text-muted-foreground">
+              <span className="mb-2 inline-block text-3xl">✉️</span>
+              <p className="font-medium text-foreground">Confirming your email...</p>
+              <p className="mt-1 text-sm">You'll be signed in shortly.</p>
+            </div>
+          </div>
+        </Layout>
+      </>
+    );
+  }
 
   return (
     <>

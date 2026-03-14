@@ -13,7 +13,7 @@ const AboutUs = () => {
         />
       </Helmet>
       <Layout>
-        <AboutSection />
+        <AboutSection asPageTitle />
       </Layout>
     </>
   );

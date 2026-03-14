@@ -8,6 +8,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { getFriendlyErrorMessage } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 import { Ban, Shield, Users } from "lucide-react";
 import { format } from "date-fns";
 import { enUS } from "date-fns/locale";
@@ -15,6 +17,7 @@ import { useState } from "react";
 
 const UsersTab = () => {
   const { toast } = useToast();
+  const { user: currentUser } = useAuth();
   const qc = useQueryClient();
   const [banDialog, setBanDialog] = useState<{ open: boolean; email: string }>({ open: false, email: "" });
   const [banReason, setBanReason] = useState("");
@@ -29,27 +32,12 @@ const UsersTab = () => {
     },
   });
 
-  const { data: bannedUsers = [] } = useQuery({
+  const { data: bannedUsers = [], isError: bannedUsersError } = useQuery({
     queryKey: ["banned_users"],
     queryFn: async () => {
-<<<<<<< HEAD
-      try {
-        const { data, error } = await supabase.from("banned_users" as any).select("*");
-        if (error) throw error;
-        const list = (data as any[]) || [];
-        list.sort((a, b) => {
-          const ta = new Date(a.banned_at ?? a.created_at ?? 0).getTime();
-          const tb = new Date(b.banned_at ?? b.created_at ?? 0).getTime();
-          return tb - ta;
-        });
-        return list;
-      } catch {
-        return [];
-      }
-=======
-      const { data } = await supabase.from("banned_users").select("*").order("banned_at", { ascending: false });
+      const { data, error } = await supabase.from("banned_users").select("*").order("banned_at", { ascending: false });
+      if (error) throw error;
       return data || [];
->>>>>>> f11194c3a55609d27f2817971afc2a5d5910b4b3
     },
   });
 
@@ -65,7 +53,7 @@ const UsersTab = () => {
       qc.invalidateQueries({ queryKey: ["admin-profiles"] });
       toast({ title: "Role updated" });
     },
-    onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
+    onError: (err: unknown) => toast({ title: "Error", description: getFriendlyErrorMessage(err), variant: "destructive" }),
   });
 
   const banMutation = useMutation({
@@ -84,7 +72,7 @@ const UsersTab = () => {
         toast({ title: "Error", description: "Something went wrong after banning.", variant: "destructive" });
       }
     },
-    onError: (e: any) => toast({ title: "Error", description: e.message, variant: "destructive" }),
+    onError: (e: unknown) => toast({ title: "Error", description: getFriendlyErrorMessage(e), variant: "destructive" }),
   });
 
   const unbanMutation = useMutation({
@@ -135,13 +123,13 @@ const UsersTab = () => {
                             <SelectItem value="admin">Admin</SelectItem>
                           </SelectContent>
                         </Select>
-<<<<<<< HEAD
-                        <Button size="sm" variant="destructive" onClick={() => setBanDialog({ open: true, email: p.email || p.id })}>
-=======
-                        <Button size="sm" variant="destructive" onClick={() => setBanDialog({ open: true, email: p.email || "" })}>
->>>>>>> f11194c3a55609d27f2817971afc2a5d5910b4b3
-                          <Ban className="mr-1 h-3 w-3" /> Ban
-                        </Button>
+                        <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => setBanDialog({ open: true, email: p.email || "" })}
+                          >
+                            <Ban className="mr-1 h-3 w-3" /> Ban
+                          </Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -159,7 +147,9 @@ const UsersTab = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {bannedUsers.length === 0 ? (
+          {bannedUsersError ? (
+            <p className="text-center text-muted-foreground py-4">Unable to load banned users list.</p>
+          ) : bannedUsers.length === 0 ? (
             <p className="text-center text-muted-foreground py-4">No banned users</p>
           ) : (
             <div className="overflow-x-auto">
@@ -211,7 +201,20 @@ const UsersTab = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setBanDialog({ open: false, email: "" })}>Cancel</Button>
-            <Button variant="destructive" onClick={() => banDialog.email && banMutation.mutate({ email: banDialog.email, reason: banReason, ip_address: banIpAddress })}>Confirm Ban</Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (!banDialog.email?.trim()) return;
+                const emailToBan = banDialog.email.trim().toLowerCase();
+                if (currentUser?.email && emailToBan === currentUser.email.toLowerCase()) {
+                  toast({ title: "Cannot ban yourself", description: "You cannot ban your own account.", variant: "destructive" });
+                  return;
+                }
+                banMutation.mutate({ email: banDialog.email.trim(), reason: banReason, ip_address: banIpAddress });
+              }}
+            >
+              Confirm Ban
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

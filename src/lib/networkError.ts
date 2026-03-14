@@ -19,5 +19,6 @@ export function isNetworkError(error: unknown): boolean {
   );
 }
 
+/** Bug #5: Single friendly message for all network/offline errors. */
 export const FRIENDLY_NETWORK_MESSAGE =
-  "Something went wrong. Please check your internet connection and try again.";
+  "We're having trouble reaching our servers. Please check your internet connection and try again.";

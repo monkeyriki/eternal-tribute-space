@@ -40,7 +40,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       password,
       options: {
         data: { full_name: fullName },
-        emailRedirectTo: window.location.origin,
+        // Bug #16: after email confirmation user lands on /auth?confirmed=1 so we can show success and redirect
+        emailRedirectTo: `${window.location.origin}/auth?confirmed=1`,
       },
     });
     if (error) throw error;

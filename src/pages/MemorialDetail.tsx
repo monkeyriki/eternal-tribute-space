@@ -21,6 +21,7 @@ import MemorialGallery from "@/components/MemorialGallery";
 import { SkeletonMemorialDetail } from "@/components/SkeletonLoaders";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { getFriendlyErrorMessage } from "@/lib/utils";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
@@ -117,23 +118,17 @@ const MemorialDetail = () => {
     if (!reportReason || !id) return;
     setReporting(true);
     try {
-      const { error } = await supabase.from("memorial_reports").insert({
-        memorial_id: id,
-        reason: reportReason,
-        details: reportDetails || null,
-<<<<<<< HEAD
-      } as any);
-=======
-        reporter_ip: window.location.hostname,
+      const { data, error } = await supabase.functions.invoke("submit-report", {
+        body: { memorial_id: id, reason: reportReason, details: reportDetails || null },
       });
->>>>>>> f11194c3a55609d27f2817971afc2a5d5910b4b3
       if (error) throw error;
+      if (data?.error) throw new Error(typeof data.error === "string" ? data.error : "Report failed");
       toast.success("Thank you, your report has been submitted for review.");
       setShowReport(false);
       setReportReason("");
       setReportDetails("");
-    } catch {
-      toast.error("Failed to submit report. Please try again.");
+    } catch (err) {
+      toast.error(getFriendlyErrorMessage(err, "report"));
     } finally {
       setReporting(false);
     }
@@ -176,13 +171,9 @@ memorialName={name}
             });
             if (data === true && !error) {
               setPasswordUnlocked(true);
-<<<<<<< HEAD
               return true;
-=======
-            } else {
-              toast.error("Wrong password. Please try again.");
->>>>>>> f11194c3a55609d27f2817971afc2a5d5910b4b3
             }
+            toast.error("Wrong password. Please try again.");
             return false;
           }}
         />
@@ -385,7 +376,7 @@ memorialName={name}
               )}
 
               <div
-                className="prose prose-sm mb-8 max-w-xl text-base leading-relaxed text-muted-foreground [&_a]:text-primary [&_a]:underline [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-foreground [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-foreground [&_p]:my-1"
+                className="prose prose-sm mb-8 max-w-xl text-base leading-relaxed text-muted-foreground [&_a]:text-primary [&_a]:underline [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-foreground [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-foreground [&_p]:my-1 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:my-2 [&_li]:my-0.5 [&_strong]:font-bold [&_b]:font-bold [&_em]:italic [&_i]:italic"
                 dangerouslySetInnerHTML={{ __html: memorial.bio || "" }}
               />
 

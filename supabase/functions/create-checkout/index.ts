@@ -7,12 +7,34 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, { apiVersion: "2025-04-30.basil" });
+// Fallback prices (USD) when store_items has no matching row – keeps Stripe working out of the box (Bug #4)
+const FALLBACK_PRICES: Record<string, Record<string, number>> = {
+  standard: { Candle: 2, Flowers: 2, candle: 2, flowers: 2 },
+  premium: { "Eternal Candle": 5, "eternal candle": 5 },
+};
+
+function getFallbackPrice(tier: string, itemType: string): number | null {
+  const normalized = (itemType || "Candle").trim();
+  const byTier = FALLBACK_PRICES[tier];
+  if (!byTier) return null;
+  return byTier[normalized] ?? byTier[normalized.toLowerCase()] ?? null;
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY");
+  if (!stripeSecretKey) {
+    console.error("STRIPE_SECRET_KEY is not set in Edge Function secrets");
+    return new Response(
+      JSON.stringify({ error: "Payment is not configured. Please set STRIPE_SECRET_KEY in Supabase." }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+
+  const stripe = new Stripe(stripeSecretKey, { apiVersion: "2025-04-30.basil" });
 
   try {
     const { memorial_id, sender_name, sender_email, message, item_type, tier, return_url } = await req.json();
@@ -24,28 +46,45 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Look up canonical price from store_items (server-side validation)
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-    );
-
-    const { data: storeItem, error: storeError } = await supabaseAdmin
-      .from("store_items")
-      .select("price, name")
-      .eq("tier", tier)
-      .eq("name", item_type || "Candle")
-      .eq("is_active", true)
-      .single();
-
-    if (storeError || !storeItem || storeItem.price <= 0) {
-      return new Response(JSON.stringify({ error: "Invalid item or tier" }), {
+    if (tier === "base") {
+      return new Response(JSON.stringify({ error: "Free tributes do not use checkout" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const price = storeItem.price;
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+
+    // Try store_items first; fall back to allowlisted prices if empty or no match (Bug #4)
+    let price: number | null = null;
+    const { data: storeItem, error: storeError } = await supabaseAdmin
+      .from("store_items")
+      .select("price, name")
+      .eq("category", "tribute")
+      .eq("tier", tier)
+      .eq("is_active", true)
+      .limit(10);
+
+    if (!storeError && storeItem?.length) {
+      const nameMatch = (item_type || "Candle").trim();
+      const found = storeItem.find(
+        (row) => row.name === nameMatch || row.name?.toLowerCase() === nameMatch.toLowerCase(),
+      );
+      if (found && Number(found.price) > 0) price = Number(found.price);
+    }
+    if (price == null) {
+      const fallback = getFallbackPrice(tier, item_type || "Candle");
+      if (fallback != null) price = fallback;
+    }
+    if (price == null || price <= 0) {
+      return new Response(JSON.stringify({ error: "Invalid item or tier" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     // Create a pending tribute in Supabase
 

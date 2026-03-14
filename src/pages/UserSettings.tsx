@@ -16,6 +16,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { getFriendlyErrorMessage } from "@/lib/utils";
 import { toast as sonnerToast } from "sonner";
 import { User, Trash2, Shield, BookOpen } from "lucide-react";
 
@@ -79,8 +80,8 @@ const UserSettings = () => {
       await signOut();
       toast({ title: "Account deleted", description: "All your data has been removed." });
       navigate("/");
-    } catch (e: any) {
-      sonnerToast.error(e.message || "Failed to delete account");
+    } catch (e: unknown) {
+      sonnerToast.error(getFriendlyErrorMessage(e, "delete_account"));
     } finally {
       setDeleting(false);
     }
@@ -102,7 +103,7 @@ const UserSettings = () => {
       });
 
       if (error) {
-        toast({ title: "Export failed", description: error.message || "Could not export your data.", variant: "destructive" });
+        toast({ title: "Export failed", description: getFriendlyErrorMessage(error, "export"), variant: "destructive" });
         return;
       }
       if (data?.error) {
@@ -130,8 +131,8 @@ const UserSettings = () => {
         title: "Export ready",
         description: "Your data has been downloaded as a JSON file.",
       });
-    } catch (e: any) {
-      toast({ title: "Export failed", description: e.message || "Something went wrong. Please try again.", variant: "destructive" });
+    } catch (e: unknown) {
+      toast({ title: "Export failed", description: getFriendlyErrorMessage(e, "export"), variant: "destructive" });
     } finally {
       setExporting(false);
     }
