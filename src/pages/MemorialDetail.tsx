@@ -21,6 +21,7 @@ import MemorialGallery from "@/components/MemorialGallery";
 import { SkeletonMemorialDetail } from "@/components/SkeletonLoaders";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 import { getFriendlyErrorMessage } from "@/lib/utils";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -182,6 +183,7 @@ memorialName={name}
   }
 
   const isOwner = !!user && user.id === memorial.user_id;
+  const canEdit = isOwner || !!isAdmin;
 
   const extractStoragePath = (url: string): string | null => {
     try {
@@ -311,7 +313,7 @@ memorialName={name}
           </Link>
         </div>
 
-        {memorial.is_draft && isOwner && (
+        {memorial.is_draft && canEdit && (
           <div className="container mx-auto mt-3 px-4">
             <div className="flex items-center gap-3 rounded-lg border border-amber-400 bg-amber-50 px-4 py-3 dark:bg-amber-950/30">
               <FileText className="h-5 w-5 shrink-0 text-amber-600" />
@@ -432,7 +434,7 @@ memorialName={name}
                   </AlertDialog>
                 )}
 
-                {isOwner && (
+                {canEdit && (
                   <Button variant="outline" size="sm" className="gap-1.5" asChild>
                     <Link to={`/memorial/${memorial.id}/edit`}>
                       <Pencil className="h-4 w-4" /> Edit
@@ -440,7 +442,7 @@ memorialName={name}
                   </Button>
                 )}
 
-                {isOwner && (
+                {canEdit && (
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button variant="destructive" size="sm" className="gap-1.5">
