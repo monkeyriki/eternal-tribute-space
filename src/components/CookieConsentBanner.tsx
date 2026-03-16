@@ -99,9 +99,9 @@ const CookieConsentBanner = () => {
               {showDetails && (
                 <div className="mb-4 space-y-2.5 rounded-lg border border-border bg-muted/30 p-3">
                   <label className="flex items-center justify-between text-xs">
-                    <span className="text-foreground font-medium">
-                      Necessari
-                      <span className="ml-1.5 text-muted-foreground font-normal">(sempre attivi)</span>
+                     <span className="text-foreground font-medium">
+                      Necessary
+                      <span className="ml-1.5 text-muted-foreground font-normal">(always active)</span>
                     </span>
                     <input type="checkbox" checked disabled className="accent-primary h-4 w-4" />
                   </label>
