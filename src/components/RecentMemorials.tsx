@@ -32,12 +32,12 @@ const RecentMemorials = () => {
           Recent Memorials
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-12">
           {isLoading
             ? Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="bg-card rounded-xl overflow-hidden shadow-soft animate-pulse">
-                  <div className="aspect-[4/3] bg-muted" />
-                  <div className="p-4 space-y-2">
+                <div key={i} className="bg-card rounded-xl overflow-hidden shadow-soft animate-pulse flex flex-col">
+                  <div className="aspect-square bg-muted shrink-0" />
+                  <div className="p-4 space-y-2 shrink-0">
                     <div className="h-4 bg-muted rounded w-3/4 mx-auto" />
                     <div className="h-3 bg-muted rounded w-1/2 mx-auto" />
                   </div>
@@ -54,26 +54,31 @@ const RecentMemorials = () => {
                   <Link
                     key={m.id}
                     to={`/memorial/${m.id}`}
-                    className="group bg-card rounded-xl overflow-hidden shadow-soft hover:shadow-card transition-shadow"
+                    className="group flex flex-col bg-card rounded-xl overflow-hidden shadow-soft hover:shadow-card transition-shadow"
                   >
-                    <div className="aspect-[4/3] bg-accent flex items-center justify-center overflow-hidden">
+                    <div className="aspect-square bg-muted/50 flex items-center justify-center overflow-hidden shrink-0">
                       {m.image_url ? (
-                        <img src={m.image_url} alt={fullName} className="h-full w-full object-contain" loading="lazy" />
+                        <img
+                          src={m.image_url}
+                          alt={fullName}
+                          className="size-full object-contain object-center"
+                          loading="lazy"
+                        />
                       ) : (
                         <span className="text-5xl text-muted-foreground/30 font-display">
                           {m.first_name.charAt(0)}
                         </span>
                       )}
                     </div>
-                    <div className="p-4 text-center">
+                    <div className="p-4 text-center shrink-0 min-h-[72px] flex flex-col justify-center">
                       <h3 className="font-display font-semibold text-foreground group-hover:text-primary transition-colors">
                         {fullName}
                       </h3>
                       {lifespan && (
-                        <p className="text-sm text-muted-foreground">{lifespan}</p>
+                        <p className="text-sm text-muted-foreground mt-0.5">{lifespan}</p>
                       )}
                       {m.location && (
-                        <p className="text-xs text-muted-foreground">{m.location}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{m.location}</p>
                       )}
                     </div>
                   </Link>

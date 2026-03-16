@@ -41,6 +41,7 @@ const getVideoEmbedUrl = (url: string): string | null => {
 const MemorialDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const { isAdmin } = useUserRole();
   const navigate = useNavigate();
   const [showQr, setShowQr] = useState(false);
   const [passwordUnlocked, setPasswordUnlocked] = useState(false);
@@ -249,6 +250,7 @@ memorialName={name}
     : memorial.first_name;
   const birthYear = memorial.birth_date ? new Date(memorial.birth_date).getFullYear() : "?";
   const deathYear = memorial.death_date ? new Date(memorial.death_date).getFullYear() : "?";
+  const headline = (memorial as any).headline?.trim() || `In memory of ${fullName}`;
   const memorialUrl = `${window.location.origin}/memorial/${memorial.id}`;
   const ogTitle = `In Memory of ${fullName}`;
   const ogDescription = memorial.bio?.slice(0, 155) || `Memorial dedicated to ${fullName}`;
@@ -333,42 +335,74 @@ memorialName={name}
 
         <AdBanner position="top" memorialPlan={memorial.plan} />
 
+        {/* Hero: phrase + image */}
+        <section className="relative min-h-[320px] md:min-h-[380px] w-full overflow-hidden">
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: memorial.image_url
+                ? `url(${memorial.image_url})`
+                : "linear-gradient(135deg, var(--muted) 0%, var(--muted-foreground/20) 100%)",
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/60 to-background/40" />
+          <div className="container relative mx-auto flex min-h-[320px] md:min-h-[380px] flex-col justify-end px-4 pb-8 pt-20 md:flex-row md:items-end md:justify-between md:pb-10 md:pt-24">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="max-w-2xl"
+            >
+              <p className="mb-1 text-sm font-medium uppercase tracking-wide text-muted-foreground md:text-base">
+                {headline}
+              </p>
+              <h1 className="font-serif text-4xl font-semibold text-foreground md:text-5xl lg:text-6xl">
+                {fullName}
+              </h1>
+              <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <Calendar className="h-4 w-4" />
+                  {birthYear} – {deathYear}
+                </span>
+                {memorial.location && (
+                  <span className="flex items-center gap-1.5">
+                    <MapPin className="h-4 w-4" />
+                    {memorial.location}
+                  </span>
+                )}
+              </div>
+            </motion.div>
+            {memorial.image_url && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="relative mt-6 flex shrink-0 md:mt-0 md:ml-6"
+              >
+                <div className="h-28 w-28 overflow-hidden rounded-full border-4 border-background/80 shadow-xl md:h-36 md:w-36">
+                  <img
+                    src={memorial.image_url}
+                    alt={fullName}
+                    className="h-full w-full object-cover"
+                    loading="eager"
+                  />
+                </div>
+                {memorial.type === "pet" && (
+                  <span className="absolute bottom-2 right-2 text-2xl md:bottom-4 md:right-4">🐾</span>
+                )}
+              </motion.div>
+            )}
+          </div>
+        </section>
+
+        {/* Bio, tags, actions */}
         <section className="container mx-auto px-4 py-8 md:py-12">
           <div className="mx-auto max-w-3xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col items-center text-center"
+              transition={{ delay: 0.1 }}
             >
-              <div className="mb-6 h-40 w-40 overflow-hidden rounded-full border-4 border-secondary shadow-card md:h-52 md:w-52">
-                <img
-                  src={memorial.image_url || "/placeholder.svg"}
-                  alt={fullName}
-                  className="h-full w-full object-cover"
-                  loading="lazy"
-                />
-              </div>
-
-              {memorial.type === "pet" && <span className="mb-2 text-2xl">🐾</span>}
-
-              <h1 className="mb-2 font-serif text-4xl font-semibold text-foreground md:text-5xl">
-                {fullName}
-              </h1>
-
-              <div className="mb-4 flex items-center gap-2 text-muted-foreground">
-                <Calendar className="h-4 w-4" />
-                <span className="text-sm">{birthYear} – {deathYear}</span>
-                {memorial.location && (
-                  <>
-                    <span className="text-border">•</span>
-                    <MapPin className="h-4 w-4" />
-                    <span className="text-sm">{memorial.location}</span>
-                  </>
-                )}
-              </div>
-
               {tags.length > 0 && (
-                <div className="mb-6 flex flex-wrap justify-center gap-2">
+                <div className="mb-6 flex flex-wrap gap-2">
                   {tags.map((tag: string) => (
                     <span key={tag} className="rounded-full bg-secondary px-3 py-1 text-xs text-secondary-foreground">
                       {tag}
@@ -378,11 +412,11 @@ memorialName={name}
               )}
 
               <div
-                className="prose prose-sm mb-8 max-w-xl text-base leading-relaxed text-muted-foreground [&_a]:text-primary [&_a]:underline [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-foreground [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-foreground [&_p]:my-1 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:my-2 [&_li]:my-0.5 [&_strong]:font-bold [&_b]:font-bold [&_em]:italic [&_i]:italic"
+                className="prose prose-sm max-w-xl text-base leading-relaxed text-muted-foreground [&_a]:text-primary [&_a]:underline [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-foreground [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-foreground [&_p]:my-1 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:my-2 [&_li]:my-0.5 [&_strong]:font-bold [&_b]:font-bold [&_em]:italic [&_i]:italic"
                 dangerouslySetInnerHTML={{ __html: memorial.bio || "" }}
               />
 
-              <div className="flex flex-wrap items-center justify-center gap-3">
+              <div className="mt-8 flex flex-wrap items-center gap-3">
                 <ShareButtons url={memorialUrl} title={ogTitle} memorialId={id} />
                 <button
                   onClick={() => setShowQr(true)}
@@ -390,7 +424,6 @@ memorialName={name}
                 >
                   <QrCode className="h-4 w-4" /> QR Code
                 </button>
-
                 {!isOwner && (
                   <AlertDialog open={showReport} onOpenChange={setShowReport}>
                     <AlertDialogTrigger asChild>
@@ -433,7 +466,6 @@ memorialName={name}
                     </AlertDialogContent>
                   </AlertDialog>
                 )}
-
                 {canEdit && (
                   <Button variant="outline" size="sm" className="gap-1.5" asChild>
                     <Link to={`/memorial/${memorial.id}/edit`}>
@@ -441,7 +473,6 @@ memorialName={name}
                     </Link>
                   </Button>
                 )}
-
                 {canEdit && (
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
@@ -530,35 +561,34 @@ memorialName={name}
           </section>
         )}
 
-        <section className="container mx-auto px-4 py-8">
-          <div className="mx-auto flex max-w-md justify-center gap-12">
-            <div className="text-center">
-              <p className="font-serif text-3xl font-semibold text-accent">{tributes.length}</p>
-              <p className="text-xs text-muted-foreground">Tributes</p>
-            </div>
-          </div>
-        </section>
-
+        {/* Tributes: list first, then "Leave a tribute" at the end */}
         <section className="py-10 md:py-14">
           <div className="container mx-auto max-w-3xl px-4">
-            <h2 className="mb-6 text-center font-serif text-2xl font-semibold text-foreground">
+            <h2 className="mb-2 text-center font-serif text-2xl font-semibold text-foreground">
               <MessageSquare className="mr-2 inline h-5 w-5" />
-              Condolence Book
+              Tributes
             </h2>
-
-            <div className="mb-8">
-              <TributeSelector
-                memorialId={memorial.id}
-                firstName={memorial.first_name}
-                onTributeAdded={() => refetchTributes()}
-                requireApproval={!!memorial.require_tribute_approval}
-              />
-            </div>
+            <p className="mb-8 text-center text-sm text-muted-foreground">
+              {tributes.length} {tributes.length === 1 ? "tribute" : "tributes"}
+            </p>
 
             <GuestbookList
               tributes={tributes}
               isOwner={isOwner}
               onTributeModerated={() => refetchTributes()}
+            />
+
+            <h3 className="mb-6 mt-12 text-center font-serif text-xl font-semibold text-foreground">
+              Condolence Book
+            </h3>
+            <p className="mb-6 text-center text-sm text-muted-foreground">
+              Leave a tribute for {memorial.first_name}
+            </p>
+            <TributeSelector
+              memorialId={memorial.id}
+              firstName={memorial.first_name}
+              onTributeAdded={() => refetchTributes()}
+              requireApproval={!!memorial.require_tribute_approval}
             />
           </div>
         </section>

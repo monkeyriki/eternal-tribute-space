@@ -12,7 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { compressImage } from "@/lib/imageCompression";
+import { compressImage, cropToSquare } from "@/lib/imageCompression";
 import { checkPhotoLimit } from "@/lib/checkPhotoLimit";
 import { getFriendlyErrorMessage } from "@/lib/utils";
 
@@ -26,7 +26,7 @@ const EditMemorial = () => {
   const queryClient = useQueryClient();
 
   const [form, setForm] = useState({
-    type: "human" as "human" | "pet", first_name: "", last_name: "", bio: "",
+    type: "human" as "human" | "pet", first_name: "", last_name: "", headline: "", bio: "",
     birth_date: "", death_date: "", location: "", visibility: "public",
     tags: "", video_url: "", password_hash: "", is_draft: true, require_tribute_approval: false,
   });
@@ -88,10 +88,12 @@ const EditMemorial = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
-      toast("Compressing image...");
+      toast("Preparing photo (same size for all memorials)...");
       const compressed = await compressImage(file);
-      setImageFile(compressed);
-      setImagePreview(URL.createObjectURL(compressed));
+      const squared = await cropToSquare(compressed);
+      setImageFile(squared);
+      setImagePreview(URL.createObjectURL(squared));
+      toast.success("Photo ready");
     } catch { toast.error("We couldn't use that photo. Please try another image or a smaller file."); }
   };
 
@@ -124,6 +126,7 @@ const EditMemorial = () => {
         type: form.type,
         first_name: form.first_name,
         last_name: form.last_name,
+        headline: form.headline || "",
         bio: form.bio,
         birth_date: form.birth_date || null,
         death_date: form.death_date || null,
@@ -290,6 +293,18 @@ const EditMemorial = () => {
                 />
               </div>
 
+              {/* Headline / Phrase */}
+              <div>
+                <label className="mb-1 block text-sm font-medium text-foreground">Headline or phrase (optional)</label>
+                <input
+                  value={form.headline}
+                  onChange={(e) => updateField("headline", e.target.value)}
+                  placeholder="e.g. In loving memory of..."
+                  className="w-full rounded-md border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+                <p className="mt-1 text-xs text-muted-foreground">Shown at the top of the memorial page above the photo.</p>
+              </div>
+
               {/* Bio */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-foreground">Biography</label>
@@ -303,6 +318,7 @@ const EditMemorial = () => {
               {/* Main Image */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-foreground">Main Photo</label>
+                <p className="mb-2 text-xs text-muted-foreground">The photo will be cropped to a square so all memorials look the same size.</p>
                 <div className="flex items-center gap-4">
                   {imagePreview && (
                     <img src={imagePreview} alt="Preview" className="h-20 w-20 rounded-lg object-cover" />
