@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  MapPin, Calendar, MessageSquare, Share2,
+  MapPin, MessageSquare, Share2,
   QrCode, ChevronLeft, Download, X, Play, Trash2, Pencil, Flag, FileText
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
