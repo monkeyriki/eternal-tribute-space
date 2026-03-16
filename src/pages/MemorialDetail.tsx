@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  MapPin, Calendar, MessageSquare, Share2,
+  MapPin, MessageSquare, Share2,
   QrCode, ChevronLeft, Download, X, Play, Trash2, Pencil, Flag, FileText
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -335,49 +335,48 @@ memorialName={name}
 
         <AdBanner position="top" memorialPlan={memorial.plan} />
 
-        {/* Hero: phrase + image */}
-        <section className="relative min-h-[320px] md:min-h-[380px] w-full overflow-hidden">
+        {/* Hero: scenic background + name + circular photo */}
+        <section className="relative min-h-[380px] md:min-h-[440px] w-full overflow-hidden">
+          {/* Scenic background */}
           <div
             className="absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage: memorial.image_url
-                ? `url(${memorial.image_url})`
-                : "linear-gradient(135deg, var(--muted) 0%, var(--muted-foreground/20) 100%)",
-            }}
+            style={{ backgroundImage: `url(/images/memorial-hero-bg.jpg)` }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/60 to-background/40" />
-          <div className="container relative mx-auto flex min-h-[320px] md:min-h-[380px] flex-col justify-end px-4 pb-8 pt-20 md:flex-row md:items-end md:justify-between md:pb-10 md:pt-24">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+
+          <div className="container relative mx-auto flex min-h-[380px] md:min-h-[440px] flex-col items-center justify-center px-4 py-16 md:flex-row md:justify-between md:py-20">
+            {/* Name & dates - centered on mobile, left on desktop */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              className="max-w-2xl"
+              className="text-center md:text-left"
             >
-              <p className="mb-1 text-sm font-medium uppercase tracking-wide text-muted-foreground md:text-base">
-                {headline}
-              </p>
-              <h1 className="font-serif text-4xl font-semibold text-foreground md:text-5xl lg:text-6xl">
+              {memorial.type === "pet" && (
+                <span className="mb-2 inline-block text-3xl">🐾</span>
+              )}
+              <h1 className="font-serif text-4xl font-semibold text-white drop-shadow-lg md:text-5xl lg:text-6xl">
                 {fullName}
               </h1>
-              <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-muted-foreground">
-                <span className="flex items-center gap-1.5">
-                  <Calendar className="h-4 w-4" />
-                  {birthYear} – {deathYear}
-                </span>
-                {memorial.location && (
-                  <span className="flex items-center gap-1.5">
-                    <MapPin className="h-4 w-4" />
-                    {memorial.location}
-                  </span>
-                )}
-              </div>
+              <p className="mt-2 font-serif text-2xl text-white/90 drop-shadow md:text-3xl">
+                {birthYear} – {deathYear}
+              </p>
+              {memorial.location && (
+                <p className="mt-3 flex items-center justify-center gap-1.5 text-sm text-white/80 md:justify-start">
+                  <MapPin className="h-4 w-4" />
+                  {memorial.location}
+                </p>
+              )}
             </motion.div>
+
+            {/* Circular photo */}
             {memorial.image_url && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="relative mt-6 flex shrink-0 md:mt-0 md:ml-6"
+                transition={{ delay: 0.15 }}
+                className="relative mt-8 shrink-0 md:mt-0 md:ml-10"
               >
-                <div className="h-28 w-28 overflow-hidden rounded-full border-4 border-background/80 shadow-xl md:h-36 md:w-36">
+                <div className="h-40 w-40 overflow-hidden rounded-full border-4 border-white/60 shadow-2xl md:h-52 md:w-52">
                   <img
                     src={memorial.image_url}
                     alt={fullName}
@@ -385,9 +384,6 @@ memorialName={name}
                     loading="eager"
                   />
                 </div>
-                {memorial.type === "pet" && (
-                  <span className="absolute bottom-2 right-2 text-2xl md:bottom-4 md:right-4">🐾</span>
-                )}
               </motion.div>
             )}
           </div>
