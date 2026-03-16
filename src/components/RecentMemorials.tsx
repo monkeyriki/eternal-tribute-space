@@ -58,7 +58,7 @@ const RecentMemorials = () => {
                   >
                     <div className="aspect-[4/3] bg-accent flex items-center justify-center overflow-hidden">
                       {m.image_url ? (
-                        <img src={m.image_url} alt={fullName} className="h-full w-full object-cover" loading="lazy" />
+                        <img src={m.image_url} alt={fullName} className="h-full w-full object-cover object-top" loading="lazy" />
                       ) : (
                         <span className="text-5xl text-muted-foreground/30 font-display">
                           {m.first_name.charAt(0)}
