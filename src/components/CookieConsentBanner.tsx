@@ -75,21 +75,21 @@ const CookieConsentBanner = () => {
                 <div className="flex items-center gap-2">
                   <Cookie className="h-5 w-5 text-primary shrink-0" />
                   <h3 className="text-sm font-semibold text-foreground">
-                    Questo sito utilizza i cookie
+                    This website uses cookies
                   </h3>
                 </div>
                 <button
                   onClick={rejectOptional}
                   className="text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label="Chiudi"
+                  aria-label="Close"
                 >
                   <X className="h-4 w-4" />
                 </button>
               </div>
 
               <p className="text-xs text-muted-foreground leading-relaxed mb-4">
-                Utilizziamo cookie tecnici necessari al funzionamento del sito. Con il tuo consenso,
-                potremmo usare anche cookie di analisi e pubblicità.{" "}
+                We use essential cookies required for the site to function. With your consent,
+                we may also use analytics and advertising cookies.{" "}
                 <Link to="/cookie-policy" className="underline text-primary hover:text-primary/80" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
                   Cookie Policy
                 </Link>
@@ -100,8 +100,8 @@ const CookieConsentBanner = () => {
                 <div className="mb-4 space-y-2.5 rounded-lg border border-border bg-muted/30 p-3">
                   <label className="flex items-center justify-between text-xs">
                     <span className="text-foreground font-medium">
-                      Necessari
-                      <span className="ml-1.5 text-muted-foreground font-normal">(sempre attivi)</span>
+                      Necessary
+                      <span className="ml-1.5 text-muted-foreground font-normal">(always active)</span>
                     </span>
                     <input type="checkbox" checked disabled className="accent-primary h-4 w-4" />
                   </label>
@@ -115,7 +115,7 @@ const CookieConsentBanner = () => {
                     />
                   </label>
                   <label className="flex items-center justify-between text-xs cursor-pointer">
-                    <span className="text-foreground font-medium">Pubblicità</span>
+                    <span className="text-foreground font-medium">Advertising</span>
                     <input
                       type="checkbox"
                       checked={preferences.advertising}
@@ -129,10 +129,10 @@ const CookieConsentBanner = () => {
               {/* Actions */}
               <div className="flex flex-wrap items-center gap-2">
                 <Button size="sm" onClick={acceptAll} className="text-xs">
-                  Accetta tutti
+                  Accept all
                 </Button>
                 <Button size="sm" variant="outline" onClick={rejectOptional} className="text-xs">
-                  Solo necessari
+                  Essential only
                 </Button>
                 {!showDetails ? (
                   <Button
@@ -141,11 +141,11 @@ const CookieConsentBanner = () => {
                     onClick={() => setShowDetails(true)}
                     className="text-xs text-muted-foreground"
                   >
-                    Personalizza
+                    Manage preferences
                   </Button>
                 ) : (
                   <Button size="sm" variant="secondary" onClick={saveCustom} className="text-xs">
-                    Salva preferenze
+                    Save preferences
                   </Button>
                 )}
               </div>
