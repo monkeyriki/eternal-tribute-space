@@ -111,7 +111,6 @@ const CreateMemorial = () => {
 
       if (error) throw error;
 
-      // Check photo limit before uploading gallery images
       if (galleryImages.length > 0 && memorial) {
         const limitCheck = await checkPhotoLimit(memorial.id, user.id);
         if (!limitCheck.allowed) {
@@ -120,7 +119,6 @@ const CreateMemorial = () => {
             description: "You have reached the photo limit for your plan. Upgrade to add more images.",
             variant: "destructive",
           });
-          // Memorial was created but gallery skipped
           navigate(`/memorial/${memorial.id}`);
           return;
         }
@@ -200,7 +198,6 @@ const CreateMemorial = () => {
             </p>
 
             <div className="space-y-6 rounded-xl border border-border bg-card p-6 shadow-soft">
-              {/* Type */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-foreground">Type</label>
                 <div className="flex gap-3">
@@ -221,7 +218,6 @@ const CreateMemorial = () => {
                 </div>
               </div>
 
-              {/* Names */}
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="mb-1 block text-sm font-medium text-foreground">First Name *</label>
@@ -242,7 +238,6 @@ const CreateMemorial = () => {
                 </div>
               </div>
 
-              {/* Dates */}
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="mb-1 block text-sm font-medium text-foreground">Date of Birth</label>
@@ -264,7 +259,6 @@ const CreateMemorial = () => {
                 </div>
               </div>
 
-              {/* Location */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-foreground">Location</label>
                 <input
@@ -297,7 +291,6 @@ const CreateMemorial = () => {
                 />
               </div>
 
-              {/* Main Image */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-foreground">Main Photo</label>
                 <p className="mb-2 text-xs text-muted-foreground">The photo will be cropped to a square so all memorials look the same size.</p>
@@ -313,14 +306,12 @@ const CreateMemorial = () => {
                 </div>
               </div>
 
-              {/* Gallery Images */}
               <MultiImageUpload
                 images={galleryImages}
                 onChange={setGalleryImages}
                 maxImages={20}
               />
 
-              {/* Video URL */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-foreground">Video (YouTube / Vimeo)</label>
                 <input
@@ -331,7 +322,6 @@ const CreateMemorial = () => {
                 />
               </div>
 
-              {/* Tags */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-foreground">Tags</label>
                 <input
@@ -342,7 +332,6 @@ const CreateMemorial = () => {
                 />
               </div>
 
-              {/* Visibility */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-foreground">Visibility</label>
                 <div className="flex gap-3">
@@ -370,7 +359,6 @@ const CreateMemorial = () => {
                 </div>
               </div>
 
-              {/* Password field (conditional) */}
               {form.visibility === "password" && (
                 <div>
                   <label className="mb-1 block text-sm font-medium text-foreground">Access Password *</label>
@@ -385,7 +373,6 @@ const CreateMemorial = () => {
                 </div>
               )}
 
-              {/* Require Tribute Approval */}
               <div className="flex items-center justify-between rounded-md border border-border px-4 py-3">
                 <div>
                   <p className="text-sm font-medium text-foreground">Require tribute approval</p>
@@ -402,7 +389,6 @@ const CreateMemorial = () => {
                 </button>
               </div>
 
-              {/* Actions */}
               <div className="flex flex-col gap-3 pt-2 sm:flex-row">
                 <button
                   onClick={() => handleSubmit(true)}

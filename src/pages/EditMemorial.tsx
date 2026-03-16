@@ -70,9 +70,9 @@ const EditMemorial = () => {
       setForm({
         type: (memorial.type as "human" | "pet") || "human",
         first_name: memorial.first_name || "", last_name: memorial.last_name || "",
-        bio: memorial.bio || "", birth_date: memorial.birth_date || "",
-        death_date: memorial.death_date || "", location: memorial.location || "",
-        visibility: memorial.visibility || "public",
+        headline: (memorial as any).headline || "", bio: memorial.bio || "",
+        birth_date: memorial.birth_date || "", death_date: memorial.death_date || "",
+        location: memorial.location || "", visibility: memorial.visibility || "public",
         tags: (memorial.tags || []).join(", "),
         video_url: memorial.video_url || "",
         password_hash: memorial.password_hash || "",
@@ -218,7 +218,6 @@ const EditMemorial = () => {
             <h1 className="mb-2 font-serif text-3xl font-semibold text-foreground">Edit Memorial</h1>
             <p className="mb-8 text-sm text-muted-foreground">Update the details of {fullName || "this memorial"}</p>
             <div className="space-y-6 rounded-xl border border-border bg-card p-6 shadow-soft">
-              {/* Type */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-foreground">Type</label>
                 <div className="flex gap-3">
@@ -239,7 +238,6 @@ const EditMemorial = () => {
                 </div>
               </div>
 
-              {/* Names */}
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="mb-1 block text-sm font-medium text-foreground">First Name *</label>
@@ -260,7 +258,6 @@ const EditMemorial = () => {
                 </div>
               </div>
 
-              {/* Dates */}
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="mb-1 block text-sm font-medium text-foreground">Date of Birth</label>
@@ -282,7 +279,6 @@ const EditMemorial = () => {
                 </div>
               </div>
 
-              {/* Location */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-foreground">Location</label>
                 <input
@@ -315,7 +311,6 @@ const EditMemorial = () => {
                 />
               </div>
 
-              {/* Main Image */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-foreground">Main Photo</label>
                 <p className="mb-2 text-xs text-muted-foreground">The photo will be cropped to a square so all memorials look the same size.</p>
@@ -331,7 +326,6 @@ const EditMemorial = () => {
                 </div>
               </div>
 
-              {/* Existing Gallery */}
               {existingGallery.length > 0 && (
                 <div>
                   <label className="mb-2 block text-sm font-medium text-foreground">Current Gallery</label>
@@ -359,14 +353,12 @@ const EditMemorial = () => {
                 </div>
               )}
 
-              {/* New Gallery Images */}
               <MultiImageUpload
                 images={newGalleryImages}
                 onChange={setNewGalleryImages}
                 maxImages={20}
               />
 
-              {/* Video URL */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-foreground">Video (YouTube / Vimeo)</label>
                 <input
@@ -377,7 +369,6 @@ const EditMemorial = () => {
                 />
               </div>
 
-              {/* Tags */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-foreground">Tags</label>
                 <input
@@ -388,7 +379,6 @@ const EditMemorial = () => {
                 />
               </div>
 
-              {/* Visibility */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-foreground">Visibility</label>
                 <div className="flex gap-3">
@@ -416,7 +406,6 @@ const EditMemorial = () => {
                 </div>
               </div>
 
-              {/* Password field */}
               {form.visibility === "password" && (
                 <div>
                   <label className="mb-1 block text-sm font-medium text-foreground">Access Password *</label>
@@ -430,7 +419,6 @@ const EditMemorial = () => {
                 </div>
               )}
 
-              {/* Require Tribute Approval */}
               <div className="flex items-center justify-between rounded-md border border-border px-4 py-3">
                 <div>
                   <p className="text-sm font-medium text-foreground">Require tribute approval</p>
@@ -447,7 +435,6 @@ const EditMemorial = () => {
                 </button>
               </div>
 
-              {/* Actions */}
               <div className="flex flex-col gap-3 pt-2 sm:flex-row">
                 <button
                   onClick={() => handleSubmit(true)}

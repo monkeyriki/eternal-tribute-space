@@ -58,7 +58,6 @@ export const compressImage = (
   quality = 0.8
 ): Promise<File> => {
   return new Promise((resolve, reject) => {
-    // Skip if already small
     if (file.size < 200 * 1024) {
       resolve(file);
       return;
@@ -72,7 +71,6 @@ export const compressImage = (
 
       let { width, height } = img;
 
-      // Calculate new dimensions
       if (width > maxWidth || height > maxHeight) {
         const ratio = Math.min(maxWidth / width, maxHeight / height);
         width = Math.round(width * ratio);
@@ -102,7 +100,6 @@ export const compressImage = (
             file.name.replace(/\.\w+$/, ".jpg"),
             { type: "image/jpeg", lastModified: Date.now() }
           );
-          // Only use compressed if actually smaller
           resolve(compressed.size < file.size ? compressed : file);
         },
         "image/jpeg",
@@ -112,7 +109,7 @@ export const compressImage = (
 
     img.onerror = () => {
       URL.revokeObjectURL(url);
-      resolve(file); // fallback to original
+      resolve(file);
     };
 
     img.src = url;
