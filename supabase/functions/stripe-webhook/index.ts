@@ -1,7 +1,7 @@
 import Stripe from "https://esm.sh/stripe@17.7.0?target=deno&no-check";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 
-const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, { apiVersion: "2025-04-30.basil" });
+const stripe: any = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, { apiVersion: "2025-04-30.basil" });
 const endpointSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
 
 const corsHeaders = {
@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
   const signature = req.headers.get("stripe-signature");
   const body = await req.text();
 
-  let event: Stripe.Event;
+  let event: any;
 
   if (!endpointSecret || !signature) {
     console.error("CRITICAL: Webhook secret or signature missing");
@@ -35,8 +35,8 @@ Deno.serve(async (req) => {
 
   try {
     event = await stripe.webhooks.constructEventAsync(body, signature, endpointSecret);
-  } catch (err) {
-    console.error("Webhook signature verification failed:", err.message);
+  } catch (err: unknown) {
+    console.error("Webhook signature verification failed:", (err as Error).message);
     return new Response(JSON.stringify({ error: "Invalid signature" }), { status: 400 });
   }
 
@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
   if (event.type === "checkout.session.completed") {
-    const session = event.data.object as Stripe.Checkout.Session;
+    const session = event.data.object as any;
     const tributeId = session.metadata?.tribute_id;
     const memorialId = session.metadata?.memorial_id;
     const userId = session.metadata?.supabase_user_id;
@@ -84,12 +84,11 @@ Deno.serve(async (req) => {
         amount,
         tribute_id: tributeId,
         memorial_id: memorialId || null,
-        description: `Paid tribute`,
       });
 
       console.log(`Tribute ${tributeId} marked as paid ($${amount})`);
 
-      // === FIX 1: Notify memorial owner after paid tribute ===
+      // === Notify memorial owner after paid tribute ===
       try {
         const effectiveMemorialId = tributeRow?.memorial_id || memorialId;
         if (RESEND_API_KEY && effectiveMemorialId && tributeRow) {
@@ -102,7 +101,6 @@ Deno.serve(async (req) => {
           if (memorialError) {
             console.error("Failed to fetch memorial for owner notification:", memorialError);
           } else if (memorial) {
-            // Get owner's email from auth.users (profiles has no email column)
             let ownerEmail: string | null = null;
             try {
               const { data: authUser, error: authError } = await supabase.auth.admin.getUserById(
@@ -117,8 +115,9 @@ Deno.serve(async (req) => {
               console.error("Failed to fetch owner for tribute email:", ownerErr);
             }
 
+            const memorialName = `${(memorial as any).first_name} ${(memorial as any).last_name || ""}`.trim();
+
             if (ownerEmail) {
-              const memorialName = `${(memorial as any).first_name} ${(memorial as any).last_name || ""}`.trim();
               const payerName = tributeRow.sender_name || "Anonimo";
               const tierLabel =
                 tributeRow.tier === "premium"
@@ -181,8 +180,8 @@ Deno.serve(async (req) => {
                 });
 
                 if (!resendRes.ok) {
-                  const err = await resendRes.text();
-                  console.error("[stripe-webhook] Failed to send owner tribute email:", err);
+                  const errText = await resendRes.text();
+                  console.error("[stripe-webhook] Failed to send owner tribute email:", errText);
                 } else {
                   console.log(`[stripe-webhook] Owner tribute email sent to ${ownerEmail}`);
                 }
@@ -191,7 +190,7 @@ Deno.serve(async (req) => {
               }
             }
 
-            // === FIX 2: Send receipt to tribute purchaser after paid tribute ===
+            // === Send receipt to tribute purchaser after paid tribute ===
             if (tributeRow.sender_email) {
               const memorialNameForReceipt = memorialName || "Memoriale";
               try {
@@ -216,8 +215,8 @@ Deno.serve(async (req) => {
                 });
 
                 if (!receiptRes.ok) {
-                  const err = await receiptRes.text();
-                  console.error("[stripe-webhook] Failed to call send-receipt function:", err);
+                  const errText = await receiptRes.text();
+                  console.error("[stripe-webhook] Failed to call send-receipt function:", errText);
                 } else {
                   console.log(`[stripe-webhook] Receipt requested for ${tributeRow.sender_email}`);
                 }
@@ -254,7 +253,6 @@ Deno.serve(async (req) => {
         type: "plan_upgrade",
         amount,
         user_id: userId,
-        description: `Plan upgrade to ${planName}`,
       });
 
       console.log(`User ${userId} upgraded to ${planName} ($${amount})`);
@@ -263,8 +261,7 @@ Deno.serve(async (req) => {
 
   // === B2B RENEWAL CONFIRMATION EMAIL ===
   if (event.type === "invoice.paid") {
-    const invoice = event.data.object as Stripe.Invoice;
-    // Only send for subscription renewals (not the first payment)
+    const invoice = event.data.object as any;
     if (invoice.billing_reason === "subscription_cycle" && invoice.customer_email) {
       const amount = (invoice.amount_paid || 0) / 100;
       const periodEnd = invoice.lines?.data?.[0]?.period?.end;
@@ -312,7 +309,7 @@ Deno.serve(async (req) => {
 
   // === SUBSCRIPTION EXPIRING SOON (upcoming invoice) ===
   if (event.type === "invoice.upcoming") {
-    const invoice = event.data.object as Stripe.Invoice;
+    const invoice = event.data.object as any;
     if (invoice.customer_email) {
       const amount = (invoice.amount_due || 0) / 100;
       const dueDate = invoice.due_date

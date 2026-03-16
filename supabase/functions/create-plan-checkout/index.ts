@@ -20,7 +20,7 @@ Deno.serve(async (req) => {
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
-  const stripe = new Stripe(stripeSecretKey, { apiVersion: "2025-04-30.basil" });
+  const stripe: any = new Stripe(stripeSecretKey, { apiVersion: "2025-04-30.basil" });
 
   try {
     const supabase = createClient(
@@ -28,7 +28,6 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_ANON_KEY")!,
     );
 
-    // Authenticate user
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("Not authenticated");
     const token = authHeader.replace("Bearer ", "");
@@ -40,7 +39,6 @@ Deno.serve(async (req) => {
 
     if (!price_id || !mode) throw new Error("Missing price_id or mode");
 
-    // Find or create Stripe customer
     const customers = await stripe.customers.list({ email: user.email!, limit: 1 });
     let customerId: string;
     if (customers.data.length > 0) {
@@ -78,9 +76,9 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("create-plan-checkout error:", err);
-    return new Response(JSON.stringify({ error: err.message }), {
+    return new Response(JSON.stringify({ error: (err as Error).message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
