@@ -7,7 +7,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Fallback prices (USD) when store_items has no matching row – keeps Stripe working out of the box (Bug #4)
+// Fallback prices (USD) when store_items has no matching row
 const FALLBACK_PRICES: Record<string, Record<string, number>> = {
   standard: { Candle: 2, Flowers: 2, candle: 2, flowers: 2 },
   premium: { "Eternal Candle": 5, "eternal candle": 5 },
@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
     );
   }
 
-  const stripe = new Stripe(stripeSecretKey, { apiVersion: "2025-04-30.basil" });
+  const stripe: any = new Stripe(stripeSecretKey, { apiVersion: "2025-04-30.basil" });
 
   try {
     const { memorial_id, sender_name, sender_email, message, item_type, tier, return_url } = await req.json();
@@ -58,7 +58,6 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    // Try store_items first; fall back to allowlisted prices if empty or no match (Bug #4)
     let price: number | null = null;
     const { data: storeItem, error: storeError } = await supabaseAdmin
       .from("store_items")
@@ -71,7 +70,7 @@ Deno.serve(async (req) => {
     if (!storeError && storeItem?.length) {
       const nameMatch = (item_type || "Candle").trim();
       const found = storeItem.find(
-        (row) => row.name === nameMatch || row.name?.toLowerCase() === nameMatch.toLowerCase(),
+        (row: any) => row.name === nameMatch || row.name?.toLowerCase() === nameMatch.toLowerCase(),
       );
       if (found && Number(found.price) > 0) price = Number(found.price);
     }
@@ -85,8 +84,6 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-
-    // Create a pending tribute in Supabase
 
     const { data: tribute, error: tributeError } = await supabaseAdmin
       .from("tributes")
@@ -111,7 +108,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Create Stripe Checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
@@ -137,7 +133,6 @@ Deno.serve(async (req) => {
       cancel_url: `${return_url}?payment=cancelled`,
     });
 
-    // Save stripe session id on tribute
     await supabaseAdmin
       .from("tributes")
       .update({ stripe_session_id: session.id })
@@ -146,9 +141,9 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ url: session.url, tribute_id: tribute.id }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("create-checkout error:", err);
-    return new Response(JSON.stringify({ error: err.message }), {
+    return new Response(JSON.stringify({ error: (err as Error).message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

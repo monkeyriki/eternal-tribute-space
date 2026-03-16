@@ -169,7 +169,7 @@ const UsersTab = () => {
                        <TableCell className="font-medium">{b.email || "—"}</TableCell>
                        <TableCell>{b.ip_address || "—"}</TableCell>
                        <TableCell>{b.reason || "—"}</TableCell>
-                       <TableCell>{format(new Date(b.banned_at ?? b.created_at ?? Date.now()), "dd MMM yyyy", { locale: enUS })}</TableCell>
+                       <TableCell>{format(new Date(b.banned_at ?? Date.now()), "dd MMM yyyy", { locale: enUS })}</TableCell>
                       <TableCell className="text-right">
                         <Button size="sm" variant="outline" onClick={() => unbanMutation.mutate(b.id)}>Remove Ban</Button>
                       </TableCell>
