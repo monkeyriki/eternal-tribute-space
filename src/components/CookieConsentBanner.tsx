@@ -145,7 +145,7 @@ const CookieConsentBanner = () => {
                   </Button>
                 ) : (
                   <Button size="sm" variant="secondary" onClick={saveCustom} className="text-xs">
-                    Salva preferenze
+                    Save Preferences
                   </Button>
                 )}
               </div>
