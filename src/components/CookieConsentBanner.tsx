@@ -129,10 +129,10 @@ const CookieConsentBanner = () => {
               {/* Actions */}
               <div className="flex flex-wrap items-center gap-2">
                 <Button size="sm" onClick={acceptAll} className="text-xs">
-                  Accetta tutti
+                  Accept All
                 </Button>
                 <Button size="sm" variant="outline" onClick={rejectOptional} className="text-xs">
-                  Solo necessari
+                  Necessary Only
                 </Button>
                 {!showDetails ? (
                   <Button
