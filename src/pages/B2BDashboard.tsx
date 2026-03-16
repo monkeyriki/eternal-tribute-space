@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -341,8 +342,13 @@ const B2BDashboard = () => {
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle className="text-lg font-sans">Your Memorials</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg font-sans">My Memorials</CardTitle>
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/my-memorials" className="text-sm text-primary hover:underline">
+                View full page →
+              </Link>
+            </Button>
           </CardHeader>
           <CardContent>
             {isLoading ? (
