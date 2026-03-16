@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
@@ -12,33 +12,22 @@ import { getFriendlyErrorMessage } from "@/lib/utils";
 const Auth = () => {
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/";
-  const confirmed = searchParams.get("confirmed") === "1";
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [resetMode, setResetMode] = useState(false);
-  const { user, signIn, signUp } = useAuth();
+  const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  // Bug #16: after email confirmation Supabase redirects to /auth?confirmed=1#...; once session is set, show success and redirect
-  useEffect(() => {
-    if (!confirmed || !user) return;
-    toast({
-      title: "Email confirmed",
-      description: "You're now signed in. Welcome!",
-    });
-    navigate(redirectTo.startsWith("/") ? redirectTo : "/", { replace: true });
-  }, [confirmed, user, redirectTo, navigate, toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     try {
       if (resetMode) {
-        // Bug #17: Reset link must open your app. Add https://yourdomain.com/reset-password to Supabase → Auth → URL Configuration → Redirect URLs.
+        // Reset link must open your app. Add https://yourdomain.com/reset-password to Supabase → Auth → URL Configuration → Redirect URLs.
         await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/reset-password`,
         });
@@ -55,8 +44,9 @@ const Auth = () => {
         await signUp(email, password, fullName);
         toast({
           title: "Registration complete",
-          description: "Check your email to confirm your account.",
         });
+        // dopo la registrazione passa alla schermata di login
+        setIsLogin(true);
       }
     } catch (error: unknown) {
       toast({
@@ -68,24 +58,6 @@ const Auth = () => {
       setSubmitting(false);
     }
   };
-
-  // Bug #16: show brief "Confirming..." when landing from email confirmation link (session not yet set)
-  if (confirmed && !user) {
-    return (
-      <>
-        <Helmet><title>Confirming email – Eternal Memory</title></Helmet>
-        <Layout>
-          <div className="flex min-h-[70vh] items-center justify-center px-4 py-16">
-            <div className="text-center text-muted-foreground">
-              <span className="mb-2 inline-block text-3xl">✉️</span>
-              <p className="font-medium text-foreground">Confirming your email...</p>
-              <p className="mt-1 text-sm">You'll be signed in shortly.</p>
-            </div>
-          </div>
-        </Layout>
-      </>
-    );
-  }
 
   return (
     <>
@@ -110,8 +82,8 @@ const Auth = () => {
                 {resetMode
                   ? "Enter your email and we'll send you a reset link."
                   : isLogin
-                    ? "Sign in to manage your memorials"
-                    : "Register to create memorials and tributes"}
+                  ? "Sign in to manage your memorials"
+                  : "Register to create memorials and tributes"}
               </p>
             </div>
 
@@ -120,8 +92,11 @@ const Auth = () => {
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <input
-                    type="text" value={fullName} onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Full name" required={!isLogin}
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Full name"
+                    required={!isLogin}
                     className="w-full rounded-md border border-border bg-background py-2.5 pl-10 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
                   />
                 </div>
@@ -129,8 +104,11 @@ const Auth = () => {
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
-                  type="email" value={email} onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Email" required
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email"
+                  required
                   className="w-full rounded-md border border-border bg-background py-2.5 pl-10 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
@@ -138,24 +116,29 @@ const Auth = () => {
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <input
-                    type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Password" required minLength={6}
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Password"
+                    required
+                    minLength={6}
                     className="w-full rounded-md border border-border bg-background py-2.5 pl-10 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
                   />
                 </div>
               )}
 
               <button
-                type="submit" disabled={submitting}
+                type="submit"
+                disabled={submitting}
                 className="flex w-full items-center justify-center gap-2 rounded-md bg-primary py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
               >
                 {submitting
                   ? "Loading..."
                   : resetMode
-                    ? "Send reset link"
-                    : isLogin
-                      ? "Sign In"
-                      : "Register"}
+                  ? "Send reset link"
+                  : isLogin
+                  ? "Sign In"
+                  : "Register"}
                 <ArrowRight className="h-4 w-4" />
               </button>
             </form>
