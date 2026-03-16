@@ -37,7 +37,20 @@ export function getFriendlyErrorMessage(
     return "We couldn't save the memorial right now. Please check your connection and try again.";
   }
   if (context === "auth") {
-    return "We couldn't sign you in. Please check your connection and try again.";
+    if (lower.includes("user already registered") || lower.includes("already been registered"))
+      return "This email is already registered. Try signing in instead.";
+    if (lower.includes("invalid login credentials") || lower.includes("invalid credentials"))
+      return "Incorrect email or password. Please try again.";
+    if (lower.includes("email not confirmed"))
+      return "Please confirm your email before signing in. Check your inbox for a verification link.";
+    if (lower.includes("password") && (lower.includes("short") || lower.includes("least")))
+      return "Password is too short. Please use at least 6 characters.";
+    if (lower.includes("rate limit") || lower.includes("too many"))
+      return "Too many attempts. Please wait a moment and try again.";
+    if (lower.includes("signup") && lower.includes("disabled"))
+      return "Registration is currently disabled. Please try again later.";
+    // Fallback: show the actual error so we can debug
+    return msg || "We couldn't complete the request. Please try again.";
   }
   if (context === "report") {
     return "We couldn't submit your report. Please try again in a moment.";
