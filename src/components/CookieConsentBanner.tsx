@@ -81,7 +81,7 @@ const CookieConsentBanner = () => {
                 <button
                   onClick={rejectOptional}
                   className="text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label="Chiudi"
+                  aria-label="Close"
                 >
                   <X className="h-4 w-4" />
                 </button>
