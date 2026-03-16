@@ -7,7 +7,7 @@ import RichTextEditor from "@/components/RichTextEditor";
 import Layout from "@/components/Layout";
 import MultiImageUpload from "@/components/MultiImageUpload";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import { useToast } from "@/hooks/use-toast";
 import { compressImage, cropToSquare } from "@/lib/imageCompression";
 import { checkPhotoLimit } from "@/lib/checkPhotoLimit";

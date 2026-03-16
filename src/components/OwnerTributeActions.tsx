@@ -1,6 +1,6 @@
 import { Check, Trash2, Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 
 interface OwnerTributeActionsProps {

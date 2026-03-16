@@ -6,7 +6,7 @@ import { Mail, Lock, User, ArrowRight } from "lucide-react";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import { getFriendlyErrorMessage } from "@/lib/utils";
 
 const Auth = () => {

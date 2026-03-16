@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Send, Mail, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import { loadProfanityWords, checkProfanity } from "@/lib/profanityFilter";
 import { Input } from "@/components/ui/input";
