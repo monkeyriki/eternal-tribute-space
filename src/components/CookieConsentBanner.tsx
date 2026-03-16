@@ -141,7 +141,7 @@ const CookieConsentBanner = () => {
                     onClick={() => setShowDetails(true)}
                     className="text-xs text-muted-foreground"
                   >
-                    Personalizza
+                    Customize
                   </Button>
                 ) : (
                   <Button size="sm" variant="secondary" onClick={saveCustom} className="text-xs">
