@@ -44,8 +44,9 @@ const Auth = () => {
         await signUp(email, password, fullName);
         toast({
           title: "Registration complete",
+          description: "Your account has been created. You can now sign in.",
         });
-        // dopo la registrazione passa alla schermata di login
+        // opzionale: passa automaticamente alla schermata di login
         setIsLogin(true);
       }
     } catch (error: unknown) {
