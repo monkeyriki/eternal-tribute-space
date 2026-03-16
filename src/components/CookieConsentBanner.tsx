@@ -75,7 +75,7 @@ const CookieConsentBanner = () => {
                 <div className="flex items-center gap-2">
                   <Cookie className="h-5 w-5 text-primary shrink-0" />
                   <h3 className="text-sm font-semibold text-foreground">
-                    Questo sito utilizza i cookie
+                    This site uses cookies
                   </h3>
                 </div>
                 <button
