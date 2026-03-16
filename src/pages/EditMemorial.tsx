@@ -10,7 +10,7 @@ import Layout from "@/components/Layout";
 import MultiImageUpload from "@/components/MultiImageUpload";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import { toast } from "sonner";
 import { compressImage, cropToSquare } from "@/lib/imageCompression";
 import { checkPhotoLimit } from "@/lib/checkPhotoLimit";

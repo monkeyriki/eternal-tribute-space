@@ -7,7 +7,7 @@ import Layout from "@/components/Layout";
 import MemorialCard from "@/components/MemorialCard";
 import AdBanner from "@/components/AdBanner";
 import { SkeletonCard } from "@/components/SkeletonLoaders";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import { Memorial } from "@/types/memorial";
 import {
   Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious,

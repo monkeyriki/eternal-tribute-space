@@ -19,7 +19,7 @@ import TributeSelector from "@/components/TributeSelector";
 import GuestbookList from "@/components/GuestbookList";
 import MemorialGallery from "@/components/MemorialGallery";
 import { SkeletonMemorialDetail } from "@/components/SkeletonLoaders";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { getFriendlyErrorMessage } from "@/lib/utils";
