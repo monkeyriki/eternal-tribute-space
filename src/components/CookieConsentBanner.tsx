@@ -115,7 +115,7 @@ const CookieConsentBanner = () => {
                     />
                   </label>
                   <label className="flex items-center justify-between text-xs cursor-pointer">
-                    <span className="text-foreground font-medium">Pubblicità</span>
+                    <span className="text-foreground font-medium">Advertising</span>
                     <input
                       type="checkbox"
                       checked={preferences.advertising}
