@@ -74,9 +74,7 @@ const CookieConsentBanner = () => {
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-center gap-2">
                   <Cookie className="h-5 w-5 text-primary shrink-0" />
-                  <h3 className="text-sm font-semibold text-foreground">
-                    This site uses cookies
-                  </h3>
+                  <h3 className="text-sm font-semibold text-foreground">This site uses cookies</h3>
                 </div>
                 <button
                   onClick={rejectOptional}
@@ -88,9 +86,13 @@ const CookieConsentBanner = () => {
               </div>
 
               <p className="text-xs text-muted-foreground leading-relaxed mb-4">
-                We use technical cookies necessary for the site to function. With your consent,
-                we may also use analytics and advertising cookies.{" "}
-                <Link to="/cookie-policy" className="underline text-primary hover:text-primary/80" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+                We use technical cookies necessary for the site to function. With your consent, we may also use
+                analytics and advertising cookies.{" "}
+                <Link
+                  to="/cookie-policy"
+                  className="underline text-primary hover:text-primary/80"
+                  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                >
                   Cookie Policy
                 </Link>
               </p>
@@ -99,7 +101,7 @@ const CookieConsentBanner = () => {
               {showDetails && (
                 <div className="mb-4 space-y-2.5 rounded-lg border border-border bg-muted/30 p-3">
                   <label className="flex items-center justify-between text-xs">
-                     <span className="text-foreground font-medium">
+                    <span className="text-foreground font-medium">
                       Necessary
                       <span className="ml-1.5 text-muted-foreground font-normal">(always active)</span>
                     </span>
