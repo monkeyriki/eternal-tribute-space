@@ -389,9 +389,9 @@ memorialName={name}
           </div>
         </section>
 
-        {/* Bio, tags, actions */}
+        {/* Bio blockquote + life details */}
         <section className="container mx-auto px-4 py-8 md:py-12">
-          <div className="mx-auto max-w-3xl">
+          <div className="mx-auto max-w-4xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -407,10 +407,33 @@ memorialName={name}
                 </div>
               )}
 
-              <div
-                className="prose prose-sm max-w-xl text-base leading-relaxed text-muted-foreground [&_a]:text-primary [&_a]:underline [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-foreground [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-foreground [&_p]:my-1 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:my-2 [&_li]:my-0.5 [&_strong]:font-bold [&_b]:font-bold [&_em]:italic [&_i]:italic"
-                dangerouslySetInnerHTML={{ __html: memorial.bio || "" }}
-              />
+              {/* Blockquote-style bio */}
+              {memorial.bio && (
+                <div className="relative mb-8 pl-10 md:pl-14">
+                  <span className="absolute left-0 top-0 font-serif text-6xl leading-none text-muted-foreground/30 md:text-7xl">"</span>
+                  <div
+                    className="font-serif text-lg italic leading-relaxed text-muted-foreground md:text-xl [&_a]:text-primary [&_a]:underline [&_p]:my-1 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:my-2 [&_li]:my-0.5 [&_strong]:font-bold [&_em]:italic"
+                    dangerouslySetInnerHTML={{ __html: memorial.bio }}
+                  />
+                </div>
+              )}
+
+              {/* Life details */}
+              <ul className="mb-8 list-disc space-y-1 pl-6 text-foreground">
+                {memorial.birth_date && memorial.death_date && (() => {
+                  const birth = new Date(memorial.birth_date!);
+                  const death = new Date(memorial.death_date!);
+                  let age = death.getFullYear() - birth.getFullYear();
+                  if (death.getMonth() < birth.getMonth() || (death.getMonth() === birth.getMonth() && death.getDate() < birth.getDate())) age--;
+                  return <li>{age} years old</li>;
+                })()}
+                {memorial.birth_date && (
+                  <li>Born on {new Date(memorial.birth_date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</li>
+                )}
+                {memorial.death_date && (
+                  <li>Passed away on {new Date(memorial.death_date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</li>
+                )}
+              </ul>
 
               <div className="mt-8 flex flex-wrap items-center gap-3">
                 <ShareButtons url={memorialUrl} title={ogTitle} memorialId={id} />
